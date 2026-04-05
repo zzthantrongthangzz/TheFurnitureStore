@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Navbar from "@/components/giaodienchung/Navbar"; // Import Navbar
-import Footer from "@/components/giaodienchung/Footer"; // Import Footer
+import Navbar from "@/components/ui/Navbar"; // Import Navbar
+import Footer from "@/components/ui/Footer"; // Import Footer
 
 export const metadata: Metadata = {
   title: "Cửa hàng Nội thất MộcHouse",
