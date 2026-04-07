@@ -98,6 +98,55 @@ const baseProducts: Product[] = [
     sizes: ["1m6", "1m8"],
     inStock: true,
   },
+  // --- 3 SẢN PHẨM CHO PHÒNG NGỦ ---
+  {
+    id: "n1",
+    name: "Bàn Trang Điểm Gỗ MOHO VIENNA 201",
+    slug: "ban-trang-diem-go-moho-vienna-201",
+    price: 2990000,
+    originalPrice: 3490000,
+    discountPercent: 14,
+    tags: ["Mới", "Trả góp 0%"],
+    imageUrl: "/images/products/vienna-201.jpg", // Dùng tạm ảnh
+    category: "phong-ngu",
+    subCategory: "ban-trang-diem", // Cấp 3 của phòng ngủ
+    collection: "VIENNA",
+    colors: ["Gỗ tự nhiên", "Nâu"],
+    sizes: ["90cm"],
+    inStock: true,
+  },
+  {
+    id: "n2",
+    name: "Tủ Đầu Giường Gỗ Tràm MOHO VLINE 601",
+    slug: "tu-dau-giuong-go-tram-moho-vline-601",
+    price: 990000,
+    originalPrice: 1290000,
+    discountPercent: 23,
+    tags: ["Bán Chạy"],
+    imageUrl: "/images/products/vline-601.jpg", // Dùng tạm ảnh
+    category: "phong-ngu",
+    subCategory: "tu-dau-giuong", // Cấp 3 của phòng ngủ
+    collection: "VLINE",
+    colors: ["Nâu"],
+    sizes: ["90cm"],
+    inStock: true,
+  },
+  {
+    id: "n3",
+    name: "Combo Phòng Ngủ MOHO OSLO",
+    slug: "combo-phong-ngu-moho-oslo",
+    price: 15990000,
+    originalPrice: 19990000,
+    discountPercent: 20,
+    tags: ["Mới", "Trả góp 0%"],
+    imageUrl: "/images/products/sofa-vline.jpg", // Dùng tạm ảnh
+    category: "phong-ngu",
+    subCategory: "combo-phong-ngu", // Cấp 3 của phòng ngủ
+    collection: "OSLO",
+    colors: ["Gỗ tự nhiên", "Trắng"],
+    sizes: ["1m6", "1m8"],
+    inStock: true,
+  },
 ];
 
 export const mockProducts: Product[] = Array.from({ length: 10 }).flatMap(
