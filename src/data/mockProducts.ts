@@ -245,6 +245,55 @@ const baseProducts: Product[] = [
     sizes: [], // Ghế thường không lọc theo kích thước chuẩn như giường/tủ
     inStock: true,
   },
+  // --- 3 SẢN PHẨM CHO PHÒNG LÀM VIỆC ---
+  {
+    id: "w1",
+    name: "Bàn Làm Việc Gỗ MOHO VLINE 601",
+    slug: "ban-lam-viec-go-moho-vline-601",
+    price: 2490000,
+    originalPrice: 2990000,
+    discountPercent: 16,
+    tags: ["Bán Chạy", "Trả góp 0%"],
+    imageUrl: "/images/products/vienna-201.jpg", // Dùng tạm ảnh
+    category: "phong-lam-viec",
+    subCategory: "ban-lam-viec", // Cấp 3 của phòng làm việc
+    collection: "VLINE",
+    colors: ["Nâu", "Gỗ tự nhiên"],
+    sizes: ["1m2", "1m4"],
+    inStock: true,
+  },
+  {
+    id: "w2",
+    name: "Ghế Xoay Văn Phòng MOHO OSLO",
+    slug: "ghe-xoay-van-phong-moho-oslo",
+    price: 1590000,
+    originalPrice: 1990000,
+    discountPercent: 20,
+    tags: ["Mới"],
+    imageUrl: "/images/products/vline-601.jpg", // Dùng tạm ảnh
+    category: "phong-lam-viec",
+    subCategory: "ghe-van-phong", // Cấp 3 của phòng làm việc
+    collection: "OSLO",
+    colors: ["Đen", "Xám"],
+    sizes: [], // Ghế thường không lọc theo kích thước m
+    inStock: true,
+  },
+  {
+    id: "w3",
+    name: "Kệ Sách Gỗ MOHO OSLO 901",
+    slug: "ke-sach-go-moho-oslo-901",
+    price: 3490000,
+    originalPrice: 4290000,
+    discountPercent: 18,
+    tags: [],
+    imageUrl: "/images/products/sofa-vline.jpg", // Dùng tạm ảnh
+    category: "phong-lam-viec",
+    subCategory: "ke-sach", // Cấp 3 của phòng làm việc
+    collection: "OSLO",
+    colors: ["Gỗ tự nhiên", "Trắng"],
+    sizes: ["90cm", "1m2"],
+    inStock: true,
+  },
 ];
 
 export const mockProducts: Product[] = Array.from({ length: 10 }).flatMap(
