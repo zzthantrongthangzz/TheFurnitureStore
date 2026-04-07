@@ -1,7 +1,6 @@
-// src/data/mockProducts.ts
 import { Product } from "@/types/product";
 
-export const mockProducts: Product[] = [
+const baseProducts: Product[] = [
   {
     id: "p1",
     name: "Tủ Quần Áo Gỗ MOHO VIENNA 201",
@@ -51,3 +50,12 @@ export const mockProducts: Product[] = [
     inStock: true,
   },
 ];
+
+export const mockProducts: Product[] = Array.from({ length: 10 }).flatMap(
+  (_, index) =>
+    baseProducts.map((product) => ({
+      ...product,
+      id: `${product.id}-${index}`,
+      price: product.price + index * 150000,
+    })),
+);
