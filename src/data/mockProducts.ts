@@ -196,6 +196,55 @@ const baseProducts: Product[] = [
     sizes: ["1m6", "1m8"],
     inStock: true,
   },
+  // --- THÊM 3 SẢN PHẨM CHO PHÒNG ĂN ---
+  {
+    id: "a1",
+    name: "Bộ Bàn Ăn Gỗ Cao Su MOHO VLINE 601",
+    slug: "bo-ban-an-go-cao-su-moho-vline-601",
+    price: 7490000,
+    originalPrice: 8990000,
+    discountPercent: 16,
+    tags: ["Bán Chạy", "Trả góp 0%"],
+    imageUrl: "/images/products/vienna-201.jpg", // Dùng tạm ảnh
+    category: "phong-an",
+    subCategory: "bo-ban-an", // Cấp 3 của phòng ăn
+    collection: "VLINE",
+    colors: ["Nâu", "Gỗ tự nhiên"],
+    sizes: ["1m4", "1m6"],
+    inStock: true,
+  },
+  {
+    id: "a2",
+    name: "Bàn Ăn Gỗ Tràm MOHO OSLO 901",
+    slug: "ban-an-go-tram-moho-oslo-901",
+    price: 3990000,
+    originalPrice: 4500000,
+    discountPercent: 11,
+    tags: ["Mới"],
+    imageUrl: "/images/products/vline-601.jpg", // Dùng tạm ảnh
+    category: "phong-an",
+    subCategory: "ban-an", // Cấp 3 của phòng ăn
+    collection: "OSLO",
+    colors: ["Gỗ tự nhiên"],
+    sizes: ["1m6", "1m8"],
+    inStock: true,
+  },
+  {
+    id: "a3",
+    name: "Ghế Ăn Gỗ Cao Su MOHO MILAN 201",
+    slug: "ghe-an-go-cao-su-moho-milan-201",
+    price: 990000,
+    originalPrice: 1290000,
+    discountPercent: 23,
+    tags: [],
+    imageUrl: "/images/products/sofa-vline.jpg", // Dùng tạm ảnh
+    category: "phong-an",
+    subCategory: "ghe-an", // Cấp 3 của phòng ăn
+    collection: "MILAN",
+    colors: ["Nâu", "Xám", "Be"],
+    sizes: [], // Ghế thường không lọc theo kích thước chuẩn như giường/tủ
+    inStock: true,
+  },
 ];
 
 export const mockProducts: Product[] = Array.from({ length: 10 }).flatMap(
