@@ -49,6 +49,55 @@ const baseProducts: Product[] = [
     sizes: ["1m8"],
     inStock: true,
   },
+  // --- 3 SẢN PHẨM CHO BỘ SƯU TẬP ---
+  {
+    id: "c1",
+    name: "Tủ Quần Áo Gỗ MOHO ASTRO 201",
+    slug: "tu-quan-ao-go-moho-astro-201",
+    price: 6490000,
+    originalPrice: 7990000,
+    discountPercent: 18,
+    tags: ["Mới", "Trả góp 0%"],
+    imageUrl: "/images/products/vienna-201.jpg", // Dùng tạm ảnh cũ để test
+    category: "bo-suu-tap",
+    subCategory: "astro", // Menu cấp 3
+    collection: "ASTRO",
+    colors: ["Gỗ tự nhiên", "Đen"],
+    sizes: ["1m6"],
+    inStock: true,
+  },
+  {
+    id: "c2",
+    name: "Bàn Ăn Gỗ Tràm MOHO SIGNATURE 701",
+    slug: "ban-an-go-tram-moho-signature-701",
+    price: 4990000,
+    originalPrice: 5500000,
+    discountPercent: 9,
+    tags: ["Bán Chạy"],
+    imageUrl: "/images/products/vline-601.jpg", // Dùng tạm ảnh cũ
+    category: "bo-suu-tap",
+    subCategory: "signature", // Menu cấp 3
+    collection: "SIGNATURE",
+    colors: ["Nâu"],
+    sizes: ["1m6", "1m8"],
+    inStock: true,
+  },
+  {
+    id: "c3",
+    name: "Giường Ngủ Gỗ MOHO OSLO 301",
+    slug: "giuong-ngu-go-moho-oslo-301",
+    price: 5990000,
+    originalPrice: 8990000,
+    discountPercent: 33,
+    tags: ["Trả góp 0%"],
+    imageUrl: "/images/products/sofa-vline.jpg", // Dùng tạm ảnh cũ
+    category: "bo-suu-tap",
+    subCategory: "oslo", // Menu cấp 3
+    collection: "OSLO",
+    colors: ["Gỗ tự nhiên", "Trắng"],
+    sizes: ["1m6", "1m8"],
+    inStock: true,
+  },
 ];
 
 export const mockProducts: Product[] = Array.from({ length: 10 }).flatMap(
