@@ -294,6 +294,55 @@ const baseProducts: Product[] = [
     sizes: ["90cm", "1m2"],
     inStock: true,
   },
+  // --- THÊM 3 SẢN PHẨM CHO NỆM ---
+  {
+    id: "m1",
+    name: "Nệm Lò Xo Túi Vạn Thành",
+    slug: "nem-lo-xo-tui-van-thanh",
+    price: 4500000,
+    originalPrice: 5500000,
+    discountPercent: 18,
+    tags: ["Bán Chạy"],
+    imageUrl: "/images/products/vienna-201.jpg", // Dùng tạm ảnh
+    category: "nem",
+    subCategory: "van-thanh", // Cấp 3 của Nệm
+    collection: "VẠN THÀNH",
+    colors: ["Trắng"],
+    sizes: ["1m6", "1m8"],
+    inStock: true,
+  },
+  {
+    id: "m2",
+    name: "Nệm Cao Su Thiên Nhiên 3THOME Sleep",
+    slug: "nem-cao-su-thien-nhien-3thome-sleep",
+    price: 8990000,
+    originalPrice: 10990000,
+    discountPercent: 18,
+    tags: ["Mới", "Trả góp 0%"],
+    imageUrl: "/images/products/vline-601.jpg", // Dùng tạm ảnh
+    category: "nem",
+    subCategory: "3thome-sleep", // Cấp 3 của Nệm
+    collection: "3THOME",
+    colors: ["Trắng", "Be"],
+    sizes: ["1m4", "1m6", "1m8"],
+    inStock: true,
+  },
+  {
+    id: "m3",
+    name: "Nệm Bông Ép Thế Giới Nệm",
+    slug: "nem-bong-ep-the-gioi-nem",
+    price: 1890000,
+    originalPrice: 2200000,
+    discountPercent: 14,
+    tags: [],
+    imageUrl: "/images/products/sofa-vline.jpg", // Dùng tạm ảnh
+    category: "nem",
+    subCategory: "the-gioi-nem", // Cấp 3 của Nệm
+    collection: "THẾ GIỚI NỆM",
+    colors: ["Trắng", "Xám"],
+    sizes: ["1m2", "1m6"],
+    inStock: true,
+  },
 ];
 
 export const mockProducts: Product[] = Array.from({ length: 10 }).flatMap(
