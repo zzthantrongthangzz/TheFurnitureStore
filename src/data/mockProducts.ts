@@ -147,6 +147,55 @@ const baseProducts: Product[] = [
     sizes: ["1m6", "1m8"],
     inStock: true,
   },
+  // --- THÊM 3 SẢN PHẨM CHO PHÒNG KHÁCH ---
+  {
+    id: "k1",
+    name: "Ghế Sofa Góc MOHO VLINE 601",
+    slug: "ghe-sofa-goc-moho-vline-601",
+    price: 8990000,
+    originalPrice: 11990000,
+    discountPercent: 25,
+    tags: ["Bán Chạy", "Trả góp 0%"],
+    imageUrl: "/images/products/sofa-vline.jpg", // Dùng tạm ảnh
+    category: "phong-khach",
+    subCategory: "ghe-sofa", // Cấp 3 của phòng khách
+    collection: "VLINE",
+    colors: ["Xám", "Be"],
+    sizes: ["1m8"],
+    inStock: true,
+  },
+  {
+    id: "k2",
+    name: "Bàn Trà Gỗ MOHO OSLO 901",
+    slug: "ban-tra-go-moho-oslo-901",
+    price: 1990000,
+    originalPrice: 2490000,
+    discountPercent: 20,
+    tags: ["Mới"],
+    imageUrl: "/images/products/vienna-201.jpg", // Dùng tạm ảnh
+    category: "phong-khach",
+    subCategory: "ban-tra", // Cấp 3 của phòng khách
+    collection: "OSLO",
+    colors: ["Gỗ tự nhiên", "Trắng"],
+    sizes: ["90cm", "1m2"],
+    inStock: true,
+  },
+  {
+    id: "k3",
+    name: "Kệ Tivi Gỗ MOHO VIENNA 201",
+    slug: "ke-tivi-go-moho-vienna-201",
+    price: 3490000,
+    originalPrice: 4500000,
+    discountPercent: 22,
+    tags: ["Trả góp 0%"],
+    imageUrl: "/images/products/vline-601.jpg", // Dùng tạm ảnh
+    category: "phong-khach",
+    subCategory: "ke-tivi", // Cấp 3 của phòng khách
+    collection: "VIENNA",
+    colors: ["Gỗ tự nhiên", "Nâu"],
+    sizes: ["1m6", "1m8"],
+    inStock: true,
+  },
 ];
 
 export const mockProducts: Product[] = Array.from({ length: 10 }).flatMap(
