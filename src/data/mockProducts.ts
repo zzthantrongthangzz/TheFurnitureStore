@@ -1,7 +1,7 @@
 // src/data/mockProducts.ts
 import { Product } from "@/types/product";
 
-export const mockProducts: Product[] = [
+const baseProducts: Product[] = [
   {
     id: "p1",
     name: "Tủ Quần Áo Gỗ MOHO VIENNA 201",
@@ -50,4 +50,115 @@ export const mockProducts: Product[] = [
     sizes: ["1m8"],
     inStock: true,
   },
+  // --- BỘ SƯU TẬP ---
+  {
+    id: "c1",
+    name: "Tủ Quần Áo Gỗ MOHO ASTRO 201",
+    slug: "tu-quan-ao-go-moho-astro-201",
+    price: 6490000,
+    originalPrice: 7990000,
+    discountPercent: 18,
+    tags: ["Mới", "Trả góp 0%"],
+    imageUrl: "/images/products/vienna-201.jpg",
+    category: "bo-suu-tap",
+    subCategory: "astro",
+    collection: "ASTRO",
+    colors: ["Gỗ tự nhiên", "Đen"],
+    sizes: ["1m6"],
+    inStock: true,
+  },
+  {
+    id: "c2",
+    name: "Bàn Ăn Gỗ Tràm MOHO SIGNATURE 701",
+    slug: "ban-an-go-tram-moho-signature-701",
+    price: 4990000,
+    originalPrice: 5500000,
+    discountPercent: 9,
+    tags: ["Bán Chạy"],
+    imageUrl: "/images/products/vline-601.jpg",
+    category: "bo-suu-tap",
+    subCategory: "signature",
+    collection: "SIGNATURE",
+    colors: ["Nâu"],
+    sizes: ["1m6", "1m8"],
+    inStock: true,
+  },
+  // --- PHÒNG NGỦ BỔ SUNG ---
+  {
+    id: "n1",
+    name: "Bàn Trang Điểm Gỗ MOHO VIENNA 201",
+    slug: "ban-trang-diem-go-moho-vienna-201",
+    price: 2990000,
+    originalPrice: 3490000,
+    discountPercent: 14,
+    tags: ["Mới", "Trả góp 0%"],
+    imageUrl: "/images/products/vienna-201.jpg",
+    category: "phong-ngu",
+    subCategory: "ban-trang-diem",
+    collection: "VIENNA",
+    colors: ["Gỗ tự nhiên", "Nâu"],
+    sizes: ["90cm"],
+    inStock: true,
+  },
+  // --- PHÒNG KHÁCH BỔ SUNG ---
+  {
+    id: "k2",
+    name: "Bàn Trà Gỗ MOHO OSLO 901",
+    slug: "ban-tra-go-moho-oslo-901",
+    price: 1990000,
+    originalPrice: 2490000,
+    discountPercent: 20,
+    tags: ["Mới"],
+    imageUrl: "/images/products/vienna-201.jpg",
+    category: "phong-khach",
+    subCategory: "ban-tra",
+    collection: "OSLO",
+    colors: ["Gỗ tự nhiên", "Trắng"],
+    sizes: ["90cm", "1m2"],
+    inStock: true,
+  },
+  // --- PHÒNG ĂN BỔ SUNG ---
+  {
+    id: "a1",
+    name: "Bộ Bàn Ăn Gỗ Cao Su MOHO VLINE 601",
+    slug: "bo-ban-an-go-cao-su-moho-vline-601",
+    price: 7490000,
+    originalPrice: 8990000,
+    discountPercent: 16,
+    tags: ["Bán Chạy", "Trả góp 0%"],
+    imageUrl: "/images/products/vienna-201.jpg",
+    category: "phong-an",
+    subCategory: "bo-ban-an",
+    collection: "VLINE",
+    colors: ["Nâu", "Gỗ tự nhiên"],
+    sizes: ["1m4", "1m6"],
+    inStock: true,
+  },
+  // --- NỆM ---
+  {
+    id: "m2",
+    name: "Nệm Cao Su Thiên Nhiên 3THOME Sleep",
+    slug: "nem-cao-su-thien-nhien-3thome-sleep",
+    price: 8990000,
+    originalPrice: 10990000,
+    discountPercent: 18,
+    tags: ["Mới", "Trả góp 0%"],
+    imageUrl: "/images/products/vline-601.jpg",
+    category: "nem",
+    subCategory: "3thome-sleep",
+    collection: "3THOME",
+    colors: ["Trắng", "Be"],
+    sizes: ["1m4", "1m6", "1m8"],
+    inStock: true,
+  },
 ];
+
+// Tạo ra danh sách lớn (nhân bản lên 10 lần) để test phân trang và lọc giá
+export const mockProducts: Product[] = Array.from({ length: 10 }).flatMap(
+  (_, index) =>
+    baseProducts.map((product) => ({
+      ...product,
+      id: `${product.id}-${index}`,
+      price: product.price + index * 150000, // Thay đổi giá một chút để đa dạng khoảng giá
+    }))
+);
