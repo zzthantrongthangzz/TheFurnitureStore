@@ -1,0 +1,355 @@
+import { Product } from "@/types/product";
+
+const baseProducts: Product[] = [
+  {
+    id: "p1",
+    name: "Tủ Quần Áo Gỗ MOHO VIENNA 201",
+    slug: "tu-quan-ao-go-moho-vienna-201",
+    price: 4490000,
+    originalPrice: 5990000,
+    discountPercent: 25,
+    tags: ["Trả góp 0%"],
+    imageUrl: "/images/products/vienna-201.jpg",
+    category: "phong-ngu",
+    subCategory: "tu-quan-ao",
+    collection: "VIENNA",
+    colors: ["Gỗ tự nhiên", "Nâu"],
+    sizes: ["1m2", "1m6"],
+    inStock: true,
+  },
+  {
+    id: "p2",
+    name: "Giường Ngủ Gỗ Tràm MOHO VLINE 601",
+    slug: "giuong-ngu-go-tram-moho-vline-601",
+    price: 3490000,
+    originalPrice: 4490000,
+    discountPercent: 22,
+    tags: ["Bán Chạy", "Trả góp 0%"],
+    imageUrl: "/images/products/vline-601.jpg",
+    category: "phong-ngu",
+    subCategory: "giuong-ngu",
+    collection: "VLINE",
+    colors: ["Nâu"],
+    sizes: ["1m2", "1m6 x 2m", "1m8 x 2m"],
+    inStock: true,
+  },
+  {
+    id: "p3",
+    name: "Ghế Sofa Băng MOHO VLINE 601",
+    slug: "ghe-sofa-bang-moho-vline-601",
+    price: 4990000,
+    originalPrice: 6990000,
+    discountPercent: 29,
+    tags: ["Trả góp 0%"],
+    imageUrl: "/images/products/sofa-vline.jpg",
+    category: "phong-khach",
+    subCategory: "ghe-sofa",
+    collection: "VLINE",
+    colors: ["Xám", "Be"],
+    sizes: ["1m8"],
+    inStock: true,
+  },
+  // --- 3 SẢN PHẨM CHO BỘ SƯU TẬP ---
+  {
+    id: "c1",
+    name: "Tủ Quần Áo Gỗ MOHO ASTRO 201",
+    slug: "tu-quan-ao-go-moho-astro-201",
+    price: 6490000,
+    originalPrice: 7990000,
+    discountPercent: 18,
+    tags: ["Mới", "Trả góp 0%"],
+    imageUrl: "/images/products/vienna-201.jpg", // Dùng tạm ảnh cũ để test
+    category: "bo-suu-tap",
+    subCategory: "astro", // Menu cấp 3
+    collection: "ASTRO",
+    colors: ["Gỗ tự nhiên", "Đen"],
+    sizes: ["1m6"],
+    inStock: true,
+  },
+  {
+    id: "c2",
+    name: "Bàn Ăn Gỗ Tràm MOHO SIGNATURE 701",
+    slug: "ban-an-go-tram-moho-signature-701",
+    price: 4990000,
+    originalPrice: 5500000,
+    discountPercent: 9,
+    tags: ["Bán Chạy"],
+    imageUrl: "/images/products/vline-601.jpg", // Dùng tạm ảnh cũ
+    category: "bo-suu-tap",
+    subCategory: "signature", // Menu cấp 3
+    collection: "SIGNATURE",
+    colors: ["Nâu"],
+    sizes: ["1m6", "1m8"],
+    inStock: true,
+  },
+  {
+    id: "c3",
+    name: "Giường Ngủ Gỗ MOHO OSLO 301",
+    slug: "giuong-ngu-go-moho-oslo-301",
+    price: 5990000,
+    originalPrice: 8990000,
+    discountPercent: 33,
+    tags: ["Trả góp 0%"],
+    imageUrl: "/images/products/sofa-vline.jpg", // Dùng tạm ảnh cũ
+    category: "bo-suu-tap",
+    subCategory: "oslo", // Menu cấp 3
+    collection: "OSLO",
+    colors: ["Gỗ tự nhiên", "Trắng"],
+    sizes: ["1m6", "1m8"],
+    inStock: true,
+  },
+  // --- 3 SẢN PHẨM CHO PHÒNG NGỦ ---
+  {
+    id: "n1",
+    name: "Bàn Trang Điểm Gỗ MOHO VIENNA 201",
+    slug: "ban-trang-diem-go-moho-vienna-201",
+    price: 2990000,
+    originalPrice: 3490000,
+    discountPercent: 14,
+    tags: ["Mới", "Trả góp 0%"],
+    imageUrl: "/images/products/vienna-201.jpg", // Dùng tạm ảnh
+    category: "phong-ngu",
+    subCategory: "ban-trang-diem", // Cấp 3 của phòng ngủ
+    collection: "VIENNA",
+    colors: ["Gỗ tự nhiên", "Nâu"],
+    sizes: ["90cm"],
+    inStock: true,
+  },
+  {
+    id: "n2",
+    name: "Tủ Đầu Giường Gỗ Tràm MOHO VLINE 601",
+    slug: "tu-dau-giuong-go-tram-moho-vline-601",
+    price: 990000,
+    originalPrice: 1290000,
+    discountPercent: 23,
+    tags: ["Bán Chạy"],
+    imageUrl: "/images/products/vline-601.jpg", // Dùng tạm ảnh
+    category: "phong-ngu",
+    subCategory: "tu-dau-giuong", // Cấp 3 của phòng ngủ
+    collection: "VLINE",
+    colors: ["Nâu"],
+    sizes: ["90cm"],
+    inStock: true,
+  },
+  {
+    id: "n3",
+    name: "Combo Phòng Ngủ MOHO OSLO",
+    slug: "combo-phong-ngu-moho-oslo",
+    price: 15990000,
+    originalPrice: 19990000,
+    discountPercent: 20,
+    tags: ["Mới", "Trả góp 0%"],
+    imageUrl: "/images/products/sofa-vline.jpg", // Dùng tạm ảnh
+    category: "phong-ngu",
+    subCategory: "combo-phong-ngu", // Cấp 3 của phòng ngủ
+    collection: "OSLO",
+    colors: ["Gỗ tự nhiên", "Trắng"],
+    sizes: ["1m6", "1m8"],
+    inStock: true,
+  },
+  // --- THÊM 3 SẢN PHẨM CHO PHÒNG KHÁCH ---
+  {
+    id: "k1",
+    name: "Ghế Sofa Góc MOHO VLINE 601",
+    slug: "ghe-sofa-goc-moho-vline-601",
+    price: 8990000,
+    originalPrice: 11990000,
+    discountPercent: 25,
+    tags: ["Bán Chạy", "Trả góp 0%"],
+    imageUrl: "/images/products/sofa-vline.jpg", // Dùng tạm ảnh
+    category: "phong-khach",
+    subCategory: "ghe-sofa", // Cấp 3 của phòng khách
+    collection: "VLINE",
+    colors: ["Xám", "Be"],
+    sizes: ["1m8"],
+    inStock: true,
+  },
+  {
+    id: "k2",
+    name: "Bàn Trà Gỗ MOHO OSLO 901",
+    slug: "ban-tra-go-moho-oslo-901",
+    price: 1990000,
+    originalPrice: 2490000,
+    discountPercent: 20,
+    tags: ["Mới"],
+    imageUrl: "/images/products/vienna-201.jpg", // Dùng tạm ảnh
+    category: "phong-khach",
+    subCategory: "ban-tra", // Cấp 3 của phòng khách
+    collection: "OSLO",
+    colors: ["Gỗ tự nhiên", "Trắng"],
+    sizes: ["90cm", "1m2"],
+    inStock: true,
+  },
+  {
+    id: "k3",
+    name: "Kệ Tivi Gỗ MOHO VIENNA 201",
+    slug: "ke-tivi-go-moho-vienna-201",
+    price: 3490000,
+    originalPrice: 4500000,
+    discountPercent: 22,
+    tags: ["Trả góp 0%"],
+    imageUrl: "/images/products/vline-601.jpg", // Dùng tạm ảnh
+    category: "phong-khach",
+    subCategory: "ke-tivi", // Cấp 3 của phòng khách
+    collection: "VIENNA",
+    colors: ["Gỗ tự nhiên", "Nâu"],
+    sizes: ["1m6", "1m8"],
+    inStock: true,
+  },
+  // --- THÊM 3 SẢN PHẨM CHO PHÒNG ĂN ---
+  {
+    id: "a1",
+    name: "Bộ Bàn Ăn Gỗ Cao Su MOHO VLINE 601",
+    slug: "bo-ban-an-go-cao-su-moho-vline-601",
+    price: 7490000,
+    originalPrice: 8990000,
+    discountPercent: 16,
+    tags: ["Bán Chạy", "Trả góp 0%"],
+    imageUrl: "/images/products/vienna-201.jpg", // Dùng tạm ảnh
+    category: "phong-an",
+    subCategory: "bo-ban-an", // Cấp 3 của phòng ăn
+    collection: "VLINE",
+    colors: ["Nâu", "Gỗ tự nhiên"],
+    sizes: ["1m4", "1m6"],
+    inStock: true,
+  },
+  {
+    id: "a2",
+    name: "Bàn Ăn Gỗ Tràm MOHO OSLO 901",
+    slug: "ban-an-go-tram-moho-oslo-901",
+    price: 3990000,
+    originalPrice: 4500000,
+    discountPercent: 11,
+    tags: ["Mới"],
+    imageUrl: "/images/products/vline-601.jpg", // Dùng tạm ảnh
+    category: "phong-an",
+    subCategory: "ban-an", // Cấp 3 của phòng ăn
+    collection: "OSLO",
+    colors: ["Gỗ tự nhiên"],
+    sizes: ["1m6", "1m8"],
+    inStock: true,
+  },
+  {
+    id: "a3",
+    name: "Ghế Ăn Gỗ Cao Su MOHO MILAN 201",
+    slug: "ghe-an-go-cao-su-moho-milan-201",
+    price: 990000,
+    originalPrice: 1290000,
+    discountPercent: 23,
+    tags: [],
+    imageUrl: "/images/products/sofa-vline.jpg", // Dùng tạm ảnh
+    category: "phong-an",
+    subCategory: "ghe-an", // Cấp 3 của phòng ăn
+    collection: "MILAN",
+    colors: ["Nâu", "Xám", "Be"],
+    sizes: [], // Ghế thường không lọc theo kích thước chuẩn như giường/tủ
+    inStock: true,
+  },
+  // --- 3 SẢN PHẨM CHO PHÒNG LÀM VIỆC ---
+  {
+    id: "w1",
+    name: "Bàn Làm Việc Gỗ MOHO VLINE 601",
+    slug: "ban-lam-viec-go-moho-vline-601",
+    price: 2490000,
+    originalPrice: 2990000,
+    discountPercent: 16,
+    tags: ["Bán Chạy", "Trả góp 0%"],
+    imageUrl: "/images/products/vienna-201.jpg", // Dùng tạm ảnh
+    category: "phong-lam-viec",
+    subCategory: "ban-lam-viec", // Cấp 3 của phòng làm việc
+    collection: "VLINE",
+    colors: ["Nâu", "Gỗ tự nhiên"],
+    sizes: ["1m2", "1m4"],
+    inStock: true,
+  },
+  {
+    id: "w2",
+    name: "Ghế Xoay Văn Phòng MOHO OSLO",
+    slug: "ghe-xoay-van-phong-moho-oslo",
+    price: 1590000,
+    originalPrice: 1990000,
+    discountPercent: 20,
+    tags: ["Mới"],
+    imageUrl: "/images/products/vline-601.jpg", // Dùng tạm ảnh
+    category: "phong-lam-viec",
+    subCategory: "ghe-van-phong", // Cấp 3 của phòng làm việc
+    collection: "OSLO",
+    colors: ["Đen", "Xám"],
+    sizes: [], // Ghế thường không lọc theo kích thước m
+    inStock: true,
+  },
+  {
+    id: "w3",
+    name: "Kệ Sách Gỗ MOHO OSLO 901",
+    slug: "ke-sach-go-moho-oslo-901",
+    price: 3490000,
+    originalPrice: 4290000,
+    discountPercent: 18,
+    tags: [],
+    imageUrl: "/images/products/sofa-vline.jpg", // Dùng tạm ảnh
+    category: "phong-lam-viec",
+    subCategory: "ke-sach", // Cấp 3 của phòng làm việc
+    collection: "OSLO",
+    colors: ["Gỗ tự nhiên", "Trắng"],
+    sizes: ["90cm", "1m2"],
+    inStock: true,
+  },
+  // --- THÊM 3 SẢN PHẨM CHO NỆM ---
+  {
+    id: "m1",
+    name: "Nệm Lò Xo Túi Vạn Thành",
+    slug: "nem-lo-xo-tui-van-thanh",
+    price: 4500000,
+    originalPrice: 5500000,
+    discountPercent: 18,
+    tags: ["Bán Chạy"],
+    imageUrl: "/images/products/vienna-201.jpg", // Dùng tạm ảnh
+    category: "nem",
+    subCategory: "van-thanh", // Cấp 3 của Nệm
+    collection: "VẠN THÀNH",
+    colors: ["Trắng"],
+    sizes: ["1m6", "1m8"],
+    inStock: true,
+  },
+  {
+    id: "m2",
+    name: "Nệm Cao Su Thiên Nhiên 3THOME Sleep",
+    slug: "nem-cao-su-thien-nhien-3thome-sleep",
+    price: 8990000,
+    originalPrice: 10990000,
+    discountPercent: 18,
+    tags: ["Mới", "Trả góp 0%"],
+    imageUrl: "/images/products/vline-601.jpg", // Dùng tạm ảnh
+    category: "nem",
+    subCategory: "3thome-sleep", // Cấp 3 của Nệm
+    collection: "3THOME",
+    colors: ["Trắng", "Be"],
+    sizes: ["1m4", "1m6", "1m8"],
+    inStock: true,
+  },
+  {
+    id: "m3",
+    name: "Nệm Bông Ép Thế Giới Nệm",
+    slug: "nem-bong-ep-the-gioi-nem",
+    price: 1890000,
+    originalPrice: 2200000,
+    discountPercent: 14,
+    tags: [],
+    imageUrl: "/images/products/sofa-vline.jpg", // Dùng tạm ảnh
+    category: "nem",
+    subCategory: "the-gioi-nem", // Cấp 3 của Nệm
+    collection: "THẾ GIỚI NỆM",
+    colors: ["Trắng", "Xám"],
+    sizes: ["1m2", "1m6"],
+    inStock: true,
+  },
+];
+
+export const mockProducts: Product[] = Array.from({ length: 10 }).flatMap(
+  (_, index) =>
+    baseProducts.map((product) => ({
+      ...product,
+      id: `${product.id}-${index}`,
+      price: product.price + index * 150000,
+    })),
+);
