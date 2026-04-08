@@ -1,8 +1,9 @@
-// src/app/products/page.tsx
+// src/app/phong-khach/page.tsx
 "use client";
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { mockProducts } from "@/data/mockProducts";
 import { useProductFilter } from "@/hooks/useProductFilter";
 import {
@@ -15,17 +16,13 @@ import {
   X,
   Filter,
 } from "lucide-react";
-import Link from "next/link";
 
-// Danh sách map tên tiếng Việt có dấu chuẩn xác (Req 6, 7, 11)
-const CATEGORIES = [
-  { label: "Bộ Sưu Tập", val: "bo-suu-tap" },
-  { label: "Phòng Ngủ", val: "phong-ngu" },
-  { label: "Phòng Khách", val: "phong-khach" },
-  { label: "Phòng Ăn", val: "phong-an" },
-  { label: "Phòng Làm Việc", val: "phong-lam-viec" },
-  { label: "Tủ Bếp", val: "tu-bep" },
-  { label: "Nệm", val: "nem" },
+const LIVING_ROOM_CATEGORIES = [
+  { label: "Ghế Sofa", val: "ghe-sofa" },
+  { label: "Bàn Trà", val: "ban-tra" },
+  { label: "Kệ Tivi", val: "ke-tivi" },
+  { label: "Tủ Giày", val: "tu-giay" },
+  { label: "Tủ Trang Trí", val: "tu-trang-tri" },
 ];
 
 const FilterAccordion = ({
@@ -58,7 +55,12 @@ const FilterAccordion = ({
   </div>
 );
 
-export default function AllProductsPage() {
+export default function LivingRoomPage() {
+  // LỌC DỮ LIỆU: Chỉ lấy các sản phẩm thuộc danh mục "phong-khach"
+  const livingRoomProducts = mockProducts.filter(
+    (p) => p.category === "phong-khach",
+  );
+
   const {
     filters,
     toggleFilter,
@@ -73,7 +75,7 @@ export default function AllProductsPage() {
     totalPages,
     paginatedProducts,
     totalCount,
-  } = useProductFilter(mockProducts);
+  } = useProductFilter(livingRoomProducts);
 
   const [openSections, setOpenSections] = useState({
     category: true,
@@ -84,7 +86,6 @@ export default function AllProductsPage() {
   const toggleSection = (key: "category" | "price" | "color" | "size") =>
     setOpenSections((prev) => ({ ...prev, [key]: !prev[key] }));
 
-  // Xử lý Slider Giá Tùy Chọn
   const [showCustomPrice, setShowCustomPrice] = useState(false);
   const [tempMinPrice, setTempMinPrice] = useState(0);
   const [tempMaxPrice, setTempMaxPrice] = useState(maxProductPrice);
@@ -97,11 +98,10 @@ export default function AllProductsPage() {
 
   return (
     <main className="min-h-screen bg-white text-gray-800">
-      {/*  Banner Hình ảnh (Responsive */}
       <div className="w-full relative aspect-[21/9] md:aspect-[1920/400] bg-gray-100 overflow-hidden">
         <Image
           src="/images/banner-products.jpg"
-          alt="Banner Tất cả sản phẩm"
+          alt="Nội Thất Phòng Khách"
           fill
           sizes="100vw"
           className="object-cover"
@@ -111,10 +111,9 @@ export default function AllProductsPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Tiêu đề và Hiển thị kết quả */}
         <div className="mb-6 border-b border-gray-100 pb-4">
           <h1 className="text-3xl md:text-4xl font-bold uppercase tracking-wider mb-4 text-gray-900">
-            Tất cả sản phẩm
+            Nội Thất Phòng Khách
           </h1>
           <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
             <span className="text-sm text-gray-500 font-medium">
@@ -135,7 +134,6 @@ export default function AllProductsPage() {
           </div>
         </div>
 
-        {/* Gom nhóm các tag đang lọc*/}
         {(filters.categories.length > 0 ||
           filters.priceRanges.length > 0 ||
           filters.colors.length > 0 ||
@@ -164,7 +162,8 @@ export default function AllProductsPage() {
                       className="flex items-center space-x-1 bg-gray-100 border border-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm"
                     >
                       <span>
-                        {CATEGORIES.find((c) => c.val === val)?.label || val}
+                        {LIVING_ROOM_CATEGORIES.find((c) => c.val === val)
+                          ?.label || val}
                       </span>
                       <button
                         onClick={() => toggleFilter("categories", val)}
@@ -177,6 +176,7 @@ export default function AllProductsPage() {
                 </div>
               )}
 
+              {/* Giữ nguyên tag Khoảng giá */}
               {(filters.priceRanges.length > 0 || customPrice) && (
                 <div className="flex items-center flex-wrap gap-2">
                   <span className="text-sm font-semibold text-gray-600 min-w-[80px]">
@@ -213,6 +213,7 @@ export default function AllProductsPage() {
                 </div>
               )}
 
+              {/* Giữ nguyên tag Màu sắc */}
               {filters.colors.length > 0 && (
                 <div className="flex items-center flex-wrap gap-2">
                   <span className="text-sm font-semibold text-gray-600 min-w-[80px]">
@@ -235,6 +236,7 @@ export default function AllProductsPage() {
                 </div>
               )}
 
+              {/* Giữ nguyên tag Kích thước */}
               {filters.sizes.length > 0 && (
                 <div className="flex items-center flex-wrap gap-2">
                   <span className="text-sm font-semibold text-gray-600 min-w-[80px]">
@@ -267,13 +269,14 @@ export default function AllProductsPage() {
                 BỘ LỌC
               </h2>
 
+              {/* ĐỔI THÀNH DANH MỤC PHÒNG KHÁCH */}
               <FilterAccordion
                 title="Danh mục"
                 isOpen={openSections.category}
                 onToggle={() => toggleSection("category")}
               >
                 <ul className="space-y-3 text-sm text-gray-600">
-                  {CATEGORIES.map((cat) => (
+                  {LIVING_ROOM_CATEGORIES.map((cat) => (
                     <label
                       key={cat.val}
                       className="flex items-center space-x-3 cursor-pointer group"
@@ -292,7 +295,7 @@ export default function AllProductsPage() {
                 </ul>
               </FilterAccordion>
 
-              {/* Bộ lọc Khoảng giá & Dual Slider */}
+              {/* Giữ nguyên filter Khoảng giá */}
               <FilterAccordion
                 title="Khoảng giá"
                 isOpen={openSections.price}
@@ -322,7 +325,6 @@ export default function AllProductsPage() {
                     </label>
                   ))}
 
-                  {/* Thanh kéo tuỳ chọn (Dual Slider CSS Trick) */}
                   <div className="pt-4 border-t border-gray-100 mt-4">
                     <label className="flex items-center space-x-3 cursor-pointer group mb-4">
                       <input
@@ -338,12 +340,10 @@ export default function AllProductsPage() {
 
                     {showCustomPrice && (
                       <div className="px-2">
-                        {/* Hiển thị số */}
                         <div className="flex justify-between text-xs text-orange-600 font-bold mb-2">
                           <span>{tempMinPrice.toLocaleString()}đ</span>
                           <span>{tempMaxPrice.toLocaleString()}đ</span>
                         </div>
-                        {/* 2 thanh kéo đè lên nhau */}
                         <div className="relative h-1.5 bg-gray-200 rounded-full mb-6">
                           <div
                             className="absolute h-1.5 bg-orange-500 rounded-full"
@@ -391,7 +391,7 @@ export default function AllProductsPage() {
                 </div>
               </FilterAccordion>
 
-              {/* Màu sắc bổ sung */}
+              {/* Giữ nguyên filter Màu sắc */}
               <FilterAccordion
                 title="Màu sắc"
                 isOpen={openSections.color}
@@ -426,7 +426,7 @@ export default function AllProductsPage() {
                 </div>
               </FilterAccordion>
 
-              {/* Thêm bộ lọc Kích thước */}
+              {/* Giữ nguyên filter Kích thước */}
               <FilterAccordion
                 title="Kích thước"
                 isOpen={openSections.size}
@@ -454,7 +454,7 @@ export default function AllProductsPage() {
             </div>
           </aside>
 
-          {/* Grid Sản phẩm*/}
+          {/* Lưới sản phẩm */}
           <section className="flex-1">
             {paginatedProducts.length === 0 ? (
               <div className="py-20 text-center text-gray-500">
@@ -537,7 +537,7 @@ export default function AllProductsPage() {
           </section>
         </div>
 
-        {/* Slogan */}
+        {/* Khối Slogan */}
         <div className="mt-20 py-10 border-t border-gray-100 flex flex-col items-center">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2 w-full max-w-4xl text-center">
             <div className="flex flex-col items-center space-y-3 group cursor-pointer">

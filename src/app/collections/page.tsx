@@ -1,8 +1,9 @@
-// src/app/products/page.tsx
+// src/app/collections/page.tsx
 "use client";
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { mockProducts } from "@/data/mockProducts";
 import { useProductFilter } from "@/hooks/useProductFilter";
 import {
@@ -15,17 +16,16 @@ import {
   X,
   Filter,
 } from "lucide-react";
-import Link from "next/link";
 
-// Danh sách map tên tiếng Việt có dấu chuẩn xác (Req 6, 7, 11)
-const CATEGORIES = [
-  { label: "Bộ Sưu Tập", val: "bo-suu-tap" },
-  { label: "Phòng Ngủ", val: "phong-ngu" },
-  { label: "Phòng Khách", val: "phong-khach" },
-  { label: "Phòng Ăn", val: "phong-an" },
-  { label: "Phòng Làm Việc", val: "phong-lam-viec" },
-  { label: "Tủ Bếp", val: "tu-bep" },
-  { label: "Nệm", val: "nem" },
+// ĐỔI LIST DANH MỤC THÀNH CÁC BỘ SƯU TẬP (Menu cấp 3)
+const SUB_COLLECTIONS = [
+  { label: "ASTRO", val: "astro" },
+  { label: "SIGNATURE", val: "signature" },
+  { label: "SCARLET", val: "scarlet" },
+  { label: "SERENA", val: "serena" },
+  { label: "OSLO", val: "oslo" },
+  { label: "MILAN", val: "milan" },
+  { label: "VLINE", val: "vline" },
 ];
 
 const FilterAccordion = ({
@@ -58,7 +58,12 @@ const FilterAccordion = ({
   </div>
 );
 
-export default function AllProductsPage() {
+export default function CollectionsPage() {
+  // BƯỚC LỌC DỮ LIỆU ĐẦU VÀO: Chỉ lấy các sản phẩm thuộc "bo-suu-tap"
+  const collectionProducts = mockProducts.filter(
+    (p) => p.category === "bo-suu-tap",
+  );
+
   const {
     filters,
     toggleFilter,
@@ -73,7 +78,7 @@ export default function AllProductsPage() {
     totalPages,
     paginatedProducts,
     totalCount,
-  } = useProductFilter(mockProducts);
+  } = useProductFilter(collectionProducts); // Truyền list đã lọc vào Hook
 
   const [openSections, setOpenSections] = useState({
     category: true,
@@ -84,7 +89,6 @@ export default function AllProductsPage() {
   const toggleSection = (key: "category" | "price" | "color" | "size") =>
     setOpenSections((prev) => ({ ...prev, [key]: !prev[key] }));
 
-  // Xử lý Slider Giá Tùy Chọn
   const [showCustomPrice, setShowCustomPrice] = useState(false);
   const [tempMinPrice, setTempMinPrice] = useState(0);
   const [tempMaxPrice, setTempMaxPrice] = useState(maxProductPrice);
@@ -97,11 +101,11 @@ export default function AllProductsPage() {
 
   return (
     <main className="min-h-screen bg-white text-gray-800">
-      {/*  Banner Hình ảnh (Responsive */}
+      {/* 1. Thay đổi Title Banner */}
       <div className="w-full relative aspect-[21/9] md:aspect-[1920/400] bg-gray-100 overflow-hidden">
         <Image
           src="/images/banner-products.jpg"
-          alt="Banner Tất cả sản phẩm"
+          alt="Bộ Sưu Tập Nội Thất"
           fill
           sizes="100vw"
           className="object-cover"
@@ -111,10 +115,10 @@ export default function AllProductsPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Tiêu đề và Hiển thị kết quả */}
+        {/* 2. Đổi Title H1 */}
         <div className="mb-6 border-b border-gray-100 pb-4">
           <h1 className="text-3xl md:text-4xl font-bold uppercase tracking-wider mb-4 text-gray-900">
-            Tất cả sản phẩm
+            Bộ Sưu Tập Nội Thất
           </h1>
           <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
             <span className="text-sm text-gray-500 font-medium">
@@ -135,7 +139,7 @@ export default function AllProductsPage() {
           </div>
         </div>
 
-        {/* Gom nhóm các tag đang lọc*/}
+        {/* Tag đang lọc */}
         {(filters.categories.length > 0 ||
           filters.priceRanges.length > 0 ||
           filters.colors.length > 0 ||
@@ -163,8 +167,10 @@ export default function AllProductsPage() {
                       key={val}
                       className="flex items-center space-x-1 bg-gray-100 border border-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm"
                     >
+                      {/* Đổi thành SUB_COLLECTIONS */}
                       <span>
-                        {CATEGORIES.find((c) => c.val === val)?.label || val}
+                        {SUB_COLLECTIONS.find((c) => c.val === val)?.label ||
+                          val}
                       </span>
                       <button
                         onClick={() => toggleFilter("categories", val)}
@@ -177,6 +183,7 @@ export default function AllProductsPage() {
                 </div>
               )}
 
+              {/* Các filter giá, màu, size giữ nguyên y hệt trang Tất cả sản phẩm */}
               {(filters.priceRanges.length > 0 || customPrice) && (
                 <div className="flex items-center flex-wrap gap-2">
                   <span className="text-sm font-semibold text-gray-600 min-w-[80px]">
@@ -267,13 +274,14 @@ export default function AllProductsPage() {
                 BỘ LỌC
               </h2>
 
+              {/* ĐỔI SUB_COLLECTIONS VÀO BỘ LỌC DANH MỤC */}
               <FilterAccordion
                 title="Danh mục"
                 isOpen={openSections.category}
                 onToggle={() => toggleSection("category")}
               >
                 <ul className="space-y-3 text-sm text-gray-600">
-                  {CATEGORIES.map((cat) => (
+                  {SUB_COLLECTIONS.map((cat) => (
                     <label
                       key={cat.val}
                       className="flex items-center space-x-3 cursor-pointer group"
@@ -292,7 +300,7 @@ export default function AllProductsPage() {
                 </ul>
               </FilterAccordion>
 
-              {/* Bộ lọc Khoảng giá & Dual Slider */}
+              {/* Phần Giá, Màu, Kích thước giữ nguyên y hệt bên Trang Sản Phẩm */}
               <FilterAccordion
                 title="Khoảng giá"
                 isOpen={openSections.price}
@@ -322,7 +330,6 @@ export default function AllProductsPage() {
                     </label>
                   ))}
 
-                  {/* Thanh kéo tuỳ chọn (Dual Slider CSS Trick) */}
                   <div className="pt-4 border-t border-gray-100 mt-4">
                     <label className="flex items-center space-x-3 cursor-pointer group mb-4">
                       <input
@@ -338,12 +345,10 @@ export default function AllProductsPage() {
 
                     {showCustomPrice && (
                       <div className="px-2">
-                        {/* Hiển thị số */}
                         <div className="flex justify-between text-xs text-orange-600 font-bold mb-2">
                           <span>{tempMinPrice.toLocaleString()}đ</span>
                           <span>{tempMaxPrice.toLocaleString()}đ</span>
                         </div>
-                        {/* 2 thanh kéo đè lên nhau */}
                         <div className="relative h-1.5 bg-gray-200 rounded-full mb-6">
                           <div
                             className="absolute h-1.5 bg-orange-500 rounded-full"
@@ -391,7 +396,6 @@ export default function AllProductsPage() {
                 </div>
               </FilterAccordion>
 
-              {/* Màu sắc bổ sung */}
               <FilterAccordion
                 title="Màu sắc"
                 isOpen={openSections.color}
@@ -426,7 +430,6 @@ export default function AllProductsPage() {
                 </div>
               </FilterAccordion>
 
-              {/* Thêm bộ lọc Kích thước */}
               <FilterAccordion
                 title="Kích thước"
                 isOpen={openSections.size}
@@ -454,7 +457,7 @@ export default function AllProductsPage() {
             </div>
           </aside>
 
-          {/* Grid Sản phẩm*/}
+          {/* Lưới sản phẩm */}
           <section className="flex-1">
             {paginatedProducts.length === 0 ? (
               <div className="py-20 text-center text-gray-500">
@@ -537,7 +540,7 @@ export default function AllProductsPage() {
           </section>
         </div>
 
-        {/* Slogan */}
+        {/* Khối Slogan */}
         <div className="mt-20 py-10 border-t border-gray-100 flex flex-col items-center">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2 w-full max-w-4xl text-center">
             <div className="flex flex-col items-center space-y-3 group cursor-pointer">
