@@ -5,14 +5,14 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: 'https',
-        hostname: 'picsum.photos',
+        protocol: "https",
+        hostname: "picsum.photos",
       },
     ],
   },
-  
+
   // Giải quyết lỗi Cross-origin khi bạn xem web bằng địa chỉ IP mạng LAN
-  allowedDevOrigins: ['26.179.93.209', 'localhost:3000'],
+  allowedDevOrigins: ["26.179.93.209", "localhost:3000"],
 };
 
 export default nextConfig;

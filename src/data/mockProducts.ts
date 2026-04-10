@@ -160,5 +160,5 @@ export const mockProducts: Product[] = Array.from({ length: 10 }).flatMap(
       ...product,
       id: `${product.id}-${index}`,
       price: product.price + index * 150000, // Thay đổi giá một chút để đa dạng khoảng giá
-    }))
+    })),
 );
