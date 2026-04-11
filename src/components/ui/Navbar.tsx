@@ -25,7 +25,7 @@ const navItems = [
   { label: "Khuyến mãi", href: "/promotions", hasDropdown: true },
   { label: "Tin tức", href: "/news", hasDropdown: true },
   { label: "Về 3T Home", href: "/about" },
-  { label: "Cửa hàng", href: "/stores" },
+  { label: "Cửa hàng", href: "/cua-hang" },
 ];
 
 const Navbar = () => {
