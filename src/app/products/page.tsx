@@ -101,7 +101,7 @@ export default function AllProductsPage() {
       {/* Banner Hình ảnh */}
       <div className="w-full relative aspect-[21/9] md:aspect-[1920/400] bg-gray-100 overflow-hidden">
         <Image
-          src="https://moho.com.vn/cdn/shop/files/Banner_Web_PC_-_Noi_that_MOHO_1.jpg?v=1701397854"
+          src="/images/banner-products.jpg"
           alt="Banner Tất cả sản phẩm"
           fill
           sizes="100vw"
