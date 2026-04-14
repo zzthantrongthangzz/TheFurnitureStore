@@ -478,6 +478,55 @@ const baseProducts: Product[] = [
     sizes: [],
     inStock: true,
   },
+  // SẢN PHẨM BỘ BÀN ĂN
+  {
+    id: "bba1",
+    name: "Bộ Bàn Ăn 4 Ghế Gỗ Cao Su MOHO VLINE",
+    slug: "bo-ban-an-4-ghe-go-cao-su-moho-vline",
+    price: 7490000,
+    originalPrice: 8990000,
+    discountPercent: 16,
+    tags: ["Bán Chạy", "Trả góp 0%"],
+    imageUrl: "/images/products/vline-601.jpg",
+    category: "phong-an",
+    subCategory: "bo-ban-an", // Key lọc cấp 3
+    collection: "VLINE",
+    colors: ["Nâu", "Gỗ tự nhiên"],
+    sizes: ["1m4"],
+    inStock: true,
+  },
+  {
+    id: "bba2",
+    name: "Bộ Bàn Ăn 6 Ghế Gỗ Tràm MOHO OSLO",
+    slug: "bo-ban-an-6-ghe-go-tram-moho-oslo",
+    price: 9990000,
+    originalPrice: 11900000,
+    discountPercent: 16,
+    tags: ["Mới", "Trả góp 0%"],
+    imageUrl: "/images/products/sofa-vline.jpg",
+    category: "phong-an",
+    subCategory: "bo-ban-an", // Key lọc cấp 3
+    collection: "OSLO",
+    colors: ["Trắng", "Gỗ tự nhiên"],
+    sizes: ["1m6", "1m8"],
+    inStock: true,
+  },
+  {
+    id: "bba3",
+    name: "Bộ Bàn Ăn Mở Rộng 6 Ghế MOHO VIENNA",
+    slug: "bo-ban-an-mo-rong-6-ghe-moho-vienna",
+    price: 12490000,
+    originalPrice: 14500000,
+    discountPercent: 13,
+    tags: [],
+    imageUrl: "/images/products/vienna-201.jpg",
+    category: "phong-an",
+    subCategory: "bo-ban-an", // Key lọc cấp 3
+    collection: "VIENNA",
+    colors: ["Nâu", "Đen"],
+    sizes: ["1m6", "2m"],
+    inStock: true,
+  },
 ];
 
 // Tạo ra danh sách lớn x10
