@@ -233,6 +233,55 @@ const baseProducts: Product[] = [
     sizes: ["1m2", "1m6"],
     inStock: true,
   },
+  // 3 SẢN PHẨM GIƯỜNG NGỦ
+  {
+    id: "gn1",
+    name: "Giường Ngủ Gỗ Tràm MOHO VLINE 601",
+    slug: "giuong-ngu-go-tram-moho-vline-601",
+    price: 4990000,
+    originalPrice: 6500000,
+    discountPercent: 23,
+    tags: ["Bán Chạy"],
+    imageUrl: "/images/products/vline-601.jpg",
+    category: "phong-ngu",
+    subCategory: "giuong-ngu", // Key lọc cấp 3
+    collection: "VLINE",
+    colors: ["Nâu", "Gỗ tự nhiên"],
+    sizes: ["1m6", "1m8"],
+    inStock: true,
+  },
+  {
+    id: "gn2",
+    name: "Giường Ngủ Gỗ Cao Su MOHO OSLO 901",
+    slug: "giuong-ngu-go-cao-su-moho-oslo-901",
+    price: 5490000,
+    originalPrice: 6200000,
+    discountPercent: 11,
+    tags: ["Mới", "Trả góp 0%"],
+    imageUrl: "/images/products/sofa-vline.jpg",
+    category: "phong-ngu",
+    subCategory: "giuong-ngu", // Key lọc cấp 3
+    collection: "OSLO",
+    colors: ["Trắng", "Gỗ tự nhiên"],
+    sizes: ["1m2", "1m4", "1m6"],
+    inStock: true,
+  },
+  {
+    id: "gn3",
+    name: "Giường Ngủ Gỗ MOHO VIENNA 201",
+    slug: "giuong-ngu-go-moho-vienna-201",
+    price: 6990000,
+    originalPrice: 8500000,
+    discountPercent: 18,
+    tags: [],
+    imageUrl: "/images/products/vienna-201.jpg",
+    category: "phong-ngu",
+    subCategory: "giuong-ngu", // Key lọc cấp 3
+    collection: "VIENNA",
+    colors: ["Nâu"],
+    sizes: ["1m6", "1m8"],
+    inStock: true,
+  },
 ];
 
 // Tạo ra danh sách lớn (nhân bản lên 10 lần) để test phân trang và lọc giá
