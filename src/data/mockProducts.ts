@@ -380,6 +380,55 @@ const baseProducts: Product[] = [
     sizes: ["90cm"],
     inStock: true,
   },
+  // SẢN PHẨM BÀN ĂN
+  {
+    id: "ba1",
+    name: "Bàn Ăn Gỗ Cao Su MOHO VLINE 601",
+    slug: "ban-an-go-cao-su-moho-vline-601",
+    price: 3490000,
+    originalPrice: 4500000,
+    discountPercent: 22,
+    tags: ["Bán Chạy"],
+    imageUrl: "/images/products/vline-601.jpg",
+    category: "phong-an",
+    subCategory: "ban-an", // Key lọc cấp 3
+    collection: "VLINE",
+    colors: ["Gỗ tự nhiên", "Nâu"],
+    sizes: ["1m4", "1m6"],
+    inStock: true,
+  },
+  {
+    id: "ba2",
+    name: "Bàn Ăn Gỗ Tràm MOHO OSLO 901",
+    slug: "ban-an-go-tram-moho-oslo-901",
+    price: 4990000,
+    originalPrice: 5900000,
+    discountPercent: 15,
+    tags: ["Mới", "Trả góp 0%"],
+    imageUrl: "/images/products/sofa-vline.jpg",
+    category: "phong-an",
+    subCategory: "ban-an", // Key lọc cấp 3
+    collection: "OSLO",
+    colors: ["Trắng", "Gỗ tự nhiên"],
+    sizes: ["1m6", "1m8", "2m"],
+    inStock: true,
+  },
+  {
+    id: "ba3",
+    name: "Bàn Ăn Mở Rộng MOHO VIENNA",
+    slug: "ban-an-mo-rong-moho-vienna",
+    price: 6490000,
+    originalPrice: 7500000,
+    discountPercent: 13,
+    tags: [],
+    imageUrl: "/images/products/vienna-201.jpg",
+    category: "phong-an",
+    subCategory: "ban-an", // Key lọc cấp 3
+    collection: "VIENNA",
+    colors: ["Nâu", "Đen"],
+    sizes: ["1m4", "1m8"],
+    inStock: true,
+  },
 ];
 
 // Tạo ra danh sách lớn x10
