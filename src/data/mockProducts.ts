@@ -282,14 +282,63 @@ const baseProducts: Product[] = [
     sizes: ["1m6", "1m8"],
     inStock: true,
   },
+  // --- THÊM 3 SẢN PHẨM TỦ ĐẦU GIƯỜNG ---
+  {
+    id: "tdg1",
+    name: "Tủ Đầu Giường Gỗ Tràm MOHO VLINE 601",
+    slug: "tu-dau-giuong-go-tram-moho-vline-601",
+    price: 1290000,
+    originalPrice: 1590000,
+    discountPercent: 18,
+    tags: ["Bán Chạy"],
+    imageUrl: "/images/products/vline-601.jpg",
+    category: "phong-ngu",
+    subCategory: "tu-dau-giuong", // Key lọc cấp 3
+    collection: "VLINE",
+    colors: ["Nâu", "Gỗ tự nhiên"],
+    sizes: ["45cm", "50cm"],
+    inStock: true,
+  },
+  {
+    id: "tdg2",
+    name: "Tủ Đầu Giường Gỗ MOHO OSLO 901",
+    slug: "tu-dau-giuong-go-moho-oslo-901",
+    price: 1490000,
+    originalPrice: 1890000,
+    discountPercent: 21,
+    tags: ["Mới"],
+    imageUrl: "/images/products/sofa-vline.jpg",
+    category: "phong-ngu",
+    subCategory: "tu-dau-giuong", // Key lọc cấp 3
+    collection: "OSLO",
+    colors: ["Trắng", "Gỗ tự nhiên"],
+    sizes: ["40cm", "50cm"],
+    inStock: true,
+  },
+  {
+    id: "tdg3",
+    name: "Tủ Đầu Giường Gỗ MOHO VIENNA 201",
+    slug: "tu-dau-giuong-go-moho-vienna-201",
+    price: 1890000,
+    originalPrice: 2200000,
+    discountPercent: 14,
+    tags: [],
+    imageUrl: "/images/products/vienna-201.jpg",
+    category: "phong-ngu",
+    subCategory: "tu-dau-giuong", // Key lọc cấp 3
+    collection: "VIENNA",
+    colors: ["Nâu"],
+    sizes: ["50cm"],
+    inStock: true,
+  },
 ];
 
-// Tạo ra danh sách lớn (nhân bản lên 10 lần) để test phân trang và lọc giá
+// Tạo ra danh sách lớn x10
 export const mockProducts: Product[] = Array.from({ length: 10 }).flatMap(
   (_, index) =>
     baseProducts.map((product) => ({
       ...product,
       id: `${product.id}-${index}`,
-      price: product.price + index * 150000, // Thay đổi giá một chút để đa dạng khoảng giá
+      price: product.price + index * 150000,
     })),
 );
