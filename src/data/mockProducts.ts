@@ -429,6 +429,55 @@ const baseProducts: Product[] = [
     sizes: ["1m4", "1m8"],
     inStock: true,
   },
+  // SẢN PHẨM GHẾ ĂN
+  {
+    id: "ga1",
+    name: "Ghế Ăn Gỗ Cao Su MOHO MILAN 201",
+    slug: "ghe-an-go-cao-su-moho-milan-201",
+    price: 990000,
+    originalPrice: 1290000,
+    discountPercent: 23,
+    tags: ["Bán Chạy"],
+    imageUrl: "/images/products/vienna-201.jpg",
+    category: "phong-an",
+    subCategory: "ghe-an", // Key lọc cấp 3
+    collection: "MILAN",
+    colors: ["Nâu", "Xám", "Gỗ tự nhiên"],
+    sizes: [], // Ghế ăn không cần size
+    inStock: true,
+  },
+  {
+    id: "ga2",
+    name: "Ghế Ăn Bọc Nệm MOHO OSLO 901",
+    slug: "ghe-an-boc-nem-moho-oslo-901",
+    price: 1290000,
+    originalPrice: 1590000,
+    discountPercent: 18,
+    tags: ["Mới"],
+    imageUrl: "/images/products/sofa-vline.jpg",
+    category: "phong-an",
+    subCategory: "ghe-an", // Key lọc cấp 3
+    collection: "OSLO",
+    colors: ["Xám", "Be"],
+    sizes: [],
+    inStock: true,
+  },
+  {
+    id: "ga3",
+    name: "Ghế Ăn Băng Dài MOHO VLINE",
+    slug: "ghe-an-bang-dai-moho-vline",
+    price: 1890000,
+    originalPrice: 2200000,
+    discountPercent: 14,
+    tags: [],
+    imageUrl: "/images/products/vline-601.jpg",
+    category: "phong-an",
+    subCategory: "ghe-an", // Key lọc cấp 3
+    collection: "VLINE",
+    colors: ["Nâu", "Gỗ tự nhiên"],
+    sizes: [],
+    inStock: true,
+  },
 ];
 
 // Tạo ra danh sách lớn x10
