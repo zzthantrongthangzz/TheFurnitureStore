@@ -282,7 +282,7 @@ const baseProducts: Product[] = [
     sizes: ["1m6", "1m8"],
     inStock: true,
   },
-  // --- THÊM 3 SẢN PHẨM TỦ ĐẦU GIƯỜNG ---
+  // 3 SẢN PHẨM TỦ ĐẦU GIƯỜNG
   {
     id: "tdg1",
     name: "Tủ Đầu Giường Gỗ Tràm MOHO VLINE 601",
@@ -329,6 +329,55 @@ const baseProducts: Product[] = [
     collection: "VIENNA",
     colors: ["Nâu"],
     sizes: ["50cm"],
+    inStock: true,
+  },
+  // SẢN PHẨM BÀN TRANG ĐIỂM
+  {
+    id: "btd1",
+    name: "Bàn Trang Điểm Gỗ MOHO VIENNA 201",
+    slug: "ban-trang-diem-go-moho-vienna-201",
+    price: 2990000,
+    originalPrice: 3490000,
+    discountPercent: 14,
+    tags: ["Bán Chạy"],
+    imageUrl: "/images/products/vienna-201.jpg",
+    category: "phong-ngu",
+    subCategory: "ban-trang-diem", // Key lọc cấp 3
+    collection: "VIENNA",
+    colors: ["Gỗ tự nhiên", "Nâu"],
+    sizes: ["80cm", "90cm"],
+    inStock: true,
+  },
+  {
+    id: "btd2",
+    name: "Bàn Trang Điểm Gỗ Cao Su MOHO OSLO 901",
+    slug: "ban-trang-diem-go-cao-su-moho-oslo-901",
+    price: 3490000,
+    originalPrice: 4200000,
+    discountPercent: 17,
+    tags: ["Mới", "Trả góp 0%"],
+    imageUrl: "/images/products/sofa-vline.jpg",
+    category: "phong-ngu",
+    subCategory: "ban-trang-diem", // Key lọc cấp 3
+    collection: "OSLO",
+    colors: ["Trắng", "Gỗ tự nhiên"],
+    sizes: ["1m", "1m2"],
+    inStock: true,
+  },
+  {
+    id: "btd3",
+    name: "Bàn Trang Điểm Gỗ Tràm MOHO VLINE",
+    slug: "ban-trang-diem-go-tram-moho-vline",
+    price: 2790000,
+    originalPrice: 3100000,
+    discountPercent: 10,
+    tags: [],
+    imageUrl: "/images/products/vline-601.jpg",
+    category: "phong-ngu",
+    subCategory: "ban-trang-diem", // Key lọc cấp 3
+    collection: "VLINE",
+    colors: ["Nâu"],
+    sizes: ["90cm"],
     inStock: true,
   },
 ];
