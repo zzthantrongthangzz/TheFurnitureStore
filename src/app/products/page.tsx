@@ -81,7 +81,7 @@ export default function AllProductsPage() {
     color: true,
     size: true,
   });
-  
+
   const toggleSection = (key: "category" | "price" | "color" | "size") =>
     setOpenSections((prev) => ({ ...prev, [key]: !prev[key] }));
 
@@ -167,7 +167,10 @@ export default function AllProductsPage() {
                       <span>
                         {CATEGORIES.find((c) => c.val === val)?.label || val}
                       </span>
-                      <button onClick={() => toggleFilter("categories", val)} className="hover:text-red-500 ml-1">
+                      <button
+                        onClick={() => toggleFilter("categories", val)}
+                        className="hover:text-red-500 ml-1"
+                      >
                         <X size={14} />
                       </button>
                     </span>
@@ -193,14 +196,19 @@ export default function AllProductsPage() {
               >
                 <ul className="space-y-3 text-sm text-gray-600">
                   {CATEGORIES.map((cat) => (
-                    <label key={cat.val} className="flex items-center space-x-3 cursor-pointer group">
+                    <label
+                      key={cat.val}
+                      className="flex items-center space-x-3 cursor-pointer group"
+                    >
                       <input
                         type="checkbox"
                         checked={filters.categories.includes(cat.val)}
                         onChange={() => toggleFilter("categories", cat.val)}
                         className="w-4 h-4 accent-orange-500 rounded border-gray-300"
                       />
-                      <span className="group-hover:text-orange-500 transition">{cat.label}</span>
+                      <span className="group-hover:text-orange-500 transition">
+                        {cat.label}
+                      </span>
                     </label>
                   ))}
                 </ul>
@@ -212,18 +220,29 @@ export default function AllProductsPage() {
                 onToggle={() => toggleSection("price")}
               >
                 <div className="space-y-3 text-sm text-gray-600">
-                  {["Dưới 500.000đ", "500.000đ - 1.000.000đ", "1.000.000đ - 1.500.000đ", "2.000.000đ - 5.000.000đ", "Trên 5.000.000đ"].map((range) => (
-                    <label key={range} className="flex items-center space-x-3 cursor-pointer group">
+                  {[
+                    "Dưới 500.000đ",
+                    "500.000đ - 1.000.000đ",
+                    "1.000.000đ - 1.500.000đ",
+                    "2.000.000đ - 5.000.000đ",
+                    "Trên 5.000.000đ",
+                  ].map((range) => (
+                    <label
+                      key={range}
+                      className="flex items-center space-x-3 cursor-pointer group"
+                    >
                       <input
                         type="checkbox"
                         checked={filters.priceRanges.includes(range)}
                         onChange={() => toggleFilter("priceRanges", range)}
                         className="w-4 h-4 accent-orange-500 rounded border-gray-300"
                       />
-                      <span className="group-hover:text-orange-500 transition">{range}</span>
+                      <span className="group-hover:text-orange-500 transition">
+                        {range}
+                      </span>
                     </label>
                   ))}
-                  
+
                   {/* Thanh kéo tuỳ chọn */}
                   <div className="pt-4 border-t border-gray-100 mt-4">
                     <label className="flex items-center space-x-3 cursor-pointer group mb-4">
@@ -233,7 +252,9 @@ export default function AllProductsPage() {
                         onChange={() => setShowCustomPrice(!showCustomPrice)}
                         className="w-4 h-4 accent-orange-500 rounded border-gray-300"
                       />
-                      <span className="group-hover:text-orange-500 transition font-medium">Tùy chọn thanh kéo</span>
+                      <span className="group-hover:text-orange-500 transition font-medium">
+                        Tùy chọn thanh kéo
+                      </span>
                     </label>
 
                     {showCustomPrice && (
@@ -256,7 +277,14 @@ export default function AllProductsPage() {
                             max={maxProductPrice}
                             step="100000"
                             value={tempMinPrice}
-                            onChange={(e) => setTempMinPrice(Math.min(Number(e.target.value), tempMaxPrice - 100000))}
+                            onChange={(e) =>
+                              setTempMinPrice(
+                                Math.min(
+                                  Number(e.target.value),
+                                  tempMaxPrice - 100000,
+                                ),
+                              )
+                            }
                             className="absolute w-full -top-2 appearance-none bg-transparent pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-orange-500 [&::-webkit-slider-thumb]:rounded-full"
                           />
                           <input
@@ -265,7 +293,14 @@ export default function AllProductsPage() {
                             max={maxProductPrice}
                             step="100000"
                             value={tempMaxPrice}
-                            onChange={(e) => setTempMaxPrice(Math.max(Number(e.target.value), tempMinPrice + 100000))}
+                            onChange={(e) =>
+                              setTempMaxPrice(
+                                Math.max(
+                                  Number(e.target.value),
+                                  tempMinPrice + 100000,
+                                ),
+                              )
+                            }
                             className="absolute w-full -top-2 appearance-none bg-transparent pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-orange-500 [&::-webkit-slider-thumb]:rounded-full"
                           />
                         </div>
@@ -280,23 +315,40 @@ export default function AllProductsPage() {
           {/* Grid Sản phẩm */}
           <section className="flex-1">
             {paginatedProducts.length === 0 ? (
-              <div className="py-20 text-center text-gray-500">Không tìm thấy sản phẩm nào.</div>
+              <div className="py-20 text-center text-gray-500">
+                Không tìm thấy sản phẩm nào.
+              </div>
             ) : (
               <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
                 {paginatedProducts.map((product) => (
-                  <div key={product.id} className="group bg-white rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col">
+                  <div
+                    key={product.id}
+                    className="group bg-white rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col"
+                  >
                     <div className="relative aspect-square overflow-hidden bg-gray-50">
-                      <Image src={product.imageUrl} alt={product.name} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
+                      <Image
+                        src={product.imageUrl}
+                        alt={product.name}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
                       {product.discountPercent && (
-                        <span className="absolute top-2 left-2 bg-red-500 text-white text-[10px] md:text-xs font-bold px-2 py-1 rounded-md z-20">-{product.discountPercent}%</span>
+                        <span className="absolute top-2 left-2 bg-red-500 text-white text-[10px] md:text-xs font-bold px-2 py-1 rounded-md z-20">
+                          -{product.discountPercent}%
+                        </span>
                       )}
                     </div>
                     <div className="p-3 md:p-4 flex flex-col flex-grow">
-                      <Link href={`/products/${product.slug}`} className="font-medium text-sm md:text-base text-gray-800 hover:text-orange-600 line-clamp-2 min-h-[2.5rem] transition mb-2">
+                      <Link
+                        href={`/products/${product.slug}`}
+                        className="font-medium text-sm md:text-base text-gray-800 hover:text-orange-600 line-clamp-2 min-h-[2.5rem] transition mb-2"
+                      >
                         {product.name}
                       </Link>
                       <div className="mt-auto flex items-center gap-2">
-                        <span className="text-orange-600 font-bold text-sm md:text-base">{product.price.toLocaleString()}đ</span>
+                        <span className="text-orange-600 font-bold text-sm md:text-base">
+                          {product.price.toLocaleString()}đ
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -324,42 +376,48 @@ export default function AllProductsPage() {
         {/* Slogan & Giá trị cốt lõi */}
         <div className="mt-20 py-10 border-t border-gray-100 flex flex-col items-center">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 w-full max-w-4xl text-center">
-             <div className="flex flex-col items-center space-y-3 group cursor-pointer">
-               <div className="p-5 bg-orange-50 rounded-full text-orange-600 group-hover:bg-orange-600 group-hover:text-white transition duration-300">
-                 <Truck size={36} strokeWidth={1.5} />
-               </div>
-               <div>
-                 <p className="font-bold text-lg text-gray-800">Giao Hàng & Lắp Đặt</p>
-                 <p className="text-orange-500 font-bold text-base">Miễn Phí</p>
-               </div>
-             </div>
-             <div className="flex flex-col items-center space-y-3 group cursor-pointer">
-               <div className="p-5 bg-orange-50 rounded-full text-orange-600 group-hover:bg-orange-600 group-hover:text-white transition duration-300">
-                 <RefreshCw size={36} strokeWidth={1.5} />
-               </div>
-               <div>
-                 <p className="font-bold text-lg text-gray-800">Đổi Trả 1 - 1</p>
-                 <p className="text-orange-500 font-bold text-base">Miễn Phí</p>
-               </div>
-             </div>
-             <div className="flex flex-col items-center space-y-3 group cursor-pointer">
-               <div className="p-5 bg-orange-50 rounded-full text-orange-600 group-hover:bg-orange-600 group-hover:text-white transition duration-300">
-                 <ShieldCheck size={36} strokeWidth={1.5} />
-               </div>
-               <div>
-                 <p className="font-bold text-lg text-gray-800">Bảo Hành 5 Năm</p>
-                 <p className="text-orange-500 font-bold text-base">Miễn Phí</p>
-               </div>
-             </div>
-             <div className="flex flex-col items-center space-y-3 group cursor-pointer">
-               <div className="p-5 bg-orange-50 rounded-full text-orange-600 group-hover:bg-orange-600 group-hover:text-white transition duration-300">
-                 <Headphones size={36} strokeWidth={1.5} />
-               </div>
-               <div>
-                 <p className="font-bold text-lg text-gray-800">Tư Vấn Thiết Kế</p>
-                 <p className="text-orange-500 font-bold text-base">Miễn Phí</p>
-               </div>
-             </div>
+            <div className="flex flex-col items-center space-y-3 group cursor-pointer">
+              <div className="p-5 bg-orange-50 rounded-full text-orange-600 group-hover:bg-orange-600 group-hover:text-white transition duration-300">
+                <Truck size={36} strokeWidth={1.5} />
+              </div>
+              <div>
+                <p className="font-bold text-lg text-gray-800">
+                  Giao Hàng & Lắp Đặt
+                </p>
+                <p className="text-orange-500 font-bold text-base">Miễn Phí</p>
+              </div>
+            </div>
+            <div className="flex flex-col items-center space-y-3 group cursor-pointer">
+              <div className="p-5 bg-orange-50 rounded-full text-orange-600 group-hover:bg-orange-600 group-hover:text-white transition duration-300">
+                <RefreshCw size={36} strokeWidth={1.5} />
+              </div>
+              <div>
+                <p className="font-bold text-lg text-gray-800">Đổi Trả 1 - 1</p>
+                <p className="text-orange-500 font-bold text-base">Miễn Phí</p>
+              </div>
+            </div>
+            <div className="flex flex-col items-center space-y-3 group cursor-pointer">
+              <div className="p-5 bg-orange-50 rounded-full text-orange-600 group-hover:bg-orange-600 group-hover:text-white transition duration-300">
+                <ShieldCheck size={36} strokeWidth={1.5} />
+              </div>
+              <div>
+                <p className="font-bold text-lg text-gray-800">
+                  Bảo Hành 5 Năm
+                </p>
+                <p className="text-orange-500 font-bold text-base">Miễn Phí</p>
+              </div>
+            </div>
+            <div className="flex flex-col items-center space-y-3 group cursor-pointer">
+              <div className="p-5 bg-orange-50 rounded-full text-orange-600 group-hover:bg-orange-600 group-hover:text-white transition duration-300">
+                <Headphones size={36} strokeWidth={1.5} />
+              </div>
+              <div>
+                <p className="font-bold text-lg text-gray-800">
+                  Tư Vấn Thiết Kế
+                </p>
+                <p className="text-orange-500 font-bold text-base">Miễn Phí</p>
+              </div>
+            </div>
           </div>
           <p className="mt-10 text-center text-gray-600 text-base md:text-lg max-w-4xl leading-relaxed px-4">
             Nội Thất 3T Home thân thiện môi trường, an toàn sức khỏe, chất lượng
