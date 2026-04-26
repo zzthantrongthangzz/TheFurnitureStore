@@ -16,7 +16,7 @@ const ProductSchema: Schema = new Schema(
     sizes: [{ type: String }],
     inStock: { type: Boolean, default: true },
   },
-  { timestamps: true },
+  { timestamps: true, collection: "products" },
 );
 
 export default mongoose.models.Product ||

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { useProductFilter } from "@/hooks/useProductFilter";
 import {
   ChevronDown,
@@ -12,7 +13,6 @@ import {
   Headphones,
   Truck,
 } from "lucide-react";
-import Link from "next/link";
 
 // Danh sách map tên tiếng Việt có dấu chuẩn xác
 const CATEGORIES = [
@@ -48,7 +48,9 @@ const FilterAccordion = ({
       />
     </button>
     <div
-      className={`overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? "max-h-96 opacity-100 overflow-y-auto" : "max-h-0 opacity-0"}`}
+      className={`overflow-hidden transition-all duration-300 ease-in-out ${
+        isOpen ? "max-h-96 opacity-100 overflow-y-auto" : "max-h-0 opacity-0"
+      }`}
     >
       {children}
     </div>
@@ -56,25 +58,34 @@ const FilterAccordion = ({
 );
 
 export default function AllProductsPage() {
-  const [productsFromDB, setProductsFromDB] = useState([]);
+  // Fix lỗi TypeScript never[] bằng cách khai báo rõ kiểu any[] (hoặc Product[])
+  const [productsFromDB, setProductsFromDB] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   // Lấy dữ liệu từ MongoDB thông qua API Route
   useEffect(() => {
     const fetchProducts = async () => {
       try {
+        setIsLoading(true);
         const response = await fetch("/api/products");
         const data = await response.json();
 
-        // Map _id thành id để khớp với logic của hook useProductFilter
-        const formattedData = data.map((p: any) => ({
-          ...p,
-          id: p._id.toString(),
-        }));
+        // KIỂM TRA AN TOÀN: Nếu data là mảng thì mới thực hiện map
+        if (Array.isArray(data)) {
+          const formattedData = data.map((p: any) => ({
+            ...p,
+            // Xử lý an toàn trường hợp thiếu _id
+            id: p._id?.toString() || p.id || Math.random().toString(),
+          }));
 
-        setProductsFromDB(formattedData);
+          setProductsFromDB(formattedData);
+        } else {
+          console.error("Dữ liệu API không phải là mảng:", data);
+          setProductsFromDB([]);
+        }
       } catch (error) {
-        console.error("Lỗi khi lấy dữ liệu sản phẩm:", error);
+        console.error("Lỗi kết nối hoặc lỗi server:", error);
+        setProductsFromDB([]);
       } finally {
         setIsLoading(false);
       }
@@ -112,15 +123,24 @@ export default function AllProductsPage() {
   // Xử lý Slider Giá Tùy Chọn
   const [showCustomPrice, setShowCustomPrice] = useState(false);
   const [tempMinPrice, setTempMinPrice] = useState(0);
-  const [tempMaxPrice, setTempMaxPrice] = useState(maxProductPrice);
+  const [tempMaxPrice, setTempMaxPrice] = useState(100000000); // Đặt mặc định cao để tránh lỗi lúc đầu
+
+  // FIX QUAN TRỌNG: Cập nhật lại max price cho thanh kéo khi data Database đã được load
+  useEffect(() => {
+    if (maxProductPrice > 0) {
+      setTempMaxPrice(maxProductPrice);
+    }
+  }, [maxProductPrice]);
 
   useEffect(() => {
-    if (showCustomPrice)
+    if (showCustomPrice) {
       setCustomPrice({ min: tempMinPrice, max: tempMaxPrice });
-    else setCustomPrice(null);
+    } else {
+      setCustomPrice(null);
+    }
   }, [showCustomPrice, tempMinPrice, tempMaxPrice, setCustomPrice]);
 
-  // Màn hình loading khi đang tải data
+  // Màn hình loading khi đang tải data (Tránh lỗi hook tính nhầm mảng rỗng)
   if (isLoading) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-white">
@@ -343,12 +363,12 @@ export default function AllProductsPage() {
                   >
                     <div className="relative aspect-square overflow-hidden bg-gray-50">
                       <Image
-                        src={product.imageUrl}
+                        src={product.imageUrl || "/images/placeholder.jpg"}
                         alt={product.name}
                         fill
                         className="object-cover group-hover:scale-105 transition-transform duration-500"
                       />
-                      {product.discountPercent && (
+                      {product.discountPercent > 0 && (
                         <span className="absolute top-2 left-2 bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded-md z-20">
                           -{product.discountPercent}%
                         </span>
@@ -365,6 +385,12 @@ export default function AllProductsPage() {
                         <span className="text-orange-600 font-bold text-sm md:text-base">
                           {product.price.toLocaleString()}đ
                         </span>
+                        {product.originalPrice &&
+                          product.originalPrice > product.price && (
+                            <span className="text-xs text-gray-400 line-through ml-2">
+                              {product.originalPrice.toLocaleString()}đ
+                            </span>
+                          )}
                       </div>
                     </div>
                   </div>
@@ -379,7 +405,11 @@ export default function AllProductsPage() {
                   <button
                     key={i}
                     onClick={() => setCurrentPage(i + 1)}
-                    className={`w-10 h-10 flex items-center justify-center font-medium rounded-lg transition ${currentPage === i + 1 ? "bg-orange-500 text-white shadow-sm" : "border border-gray-200 text-gray-600 hover:bg-orange-50"}`}
+                    className={`w-10 h-10 flex items-center justify-center font-medium rounded-lg transition ${
+                      currentPage === i + 1
+                        ? "bg-orange-500 text-white shadow-sm"
+                        : "border border-gray-200 text-gray-600 hover:bg-orange-50"
+                    }`}
                   >
                     {i + 1}
                   </button>

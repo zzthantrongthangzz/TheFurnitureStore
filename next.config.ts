@@ -7,13 +7,9 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "picsum.photos",
       },
-      {
-        protocol: 'https',
-        hostname: 'moho.com.vn',
-      },
     ],
   },
-  allowedDevOrigins: ['26.179.93.209', 'localhost:3000'],
+  allowedDevOrigins: ["*"],
 };
 
 export default nextConfig;

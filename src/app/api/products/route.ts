@@ -6,8 +6,12 @@ export async function GET() {
   try {
     await connectToDatabase();
     const products = await ProductModel.find({}).lean();
-    return NextResponse.json(products);
+    // Đảm bảo luôn trả về mảng
+    return NextResponse.json(products || []);
   } catch (error) {
-    return NextResponse.json({ error: "Lỗi lấy dữ liệu" }, { status: 500 });
+    console.error("API Error:", error);
+    // Trả về mảng rỗng để Frontend .map() không bị lỗi,
+    // kèm theo header status 500 để vẫn biết là có lỗi.
+    return NextResponse.json([], { status: 500 });
   }
 }
