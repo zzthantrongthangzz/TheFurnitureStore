@@ -12,7 +12,11 @@ import {
   ShieldCheck,
   Headphones,
   Truck,
+  ShoppingCart, // Đã import thêm icon giỏ hàng
 } from "lucide-react";
+
+// ĐÃ IMPORT STORE GIỎ HÀNG
+import { useCart } from "@/hooks/useCart";
 
 // Danh sách map tên tiếng Việt có dấu chuẩn xác
 const CATEGORIES = [
@@ -58,11 +62,12 @@ const FilterAccordion = ({
 );
 
 export default function AllProductsPage() {
-  // Fix lỗi TypeScript never[] bằng cách khai báo rõ kiểu any[] (hoặc Product[])
   const [productsFromDB, setProductsFromDB] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Lấy dữ liệu từ MongoDB thông qua API Route
+  // GỌI HÀM THÊM VÀO GIỎ HÀNG TỪ STORE
+  const addItem = useCart((state) => state.addItem);
+
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -70,11 +75,9 @@ export default function AllProductsPage() {
         const response = await fetch("/api/products");
         const data = await response.json();
 
-        // KIỂM TRA AN TOÀN: Nếu data là mảng thì mới thực hiện map
         if (Array.isArray(data)) {
           const formattedData = data.map((p: any) => ({
             ...p,
-            // Xử lý an toàn trường hợp thiếu _id
             id: p._id?.toString() || p.id || Math.random().toString(),
           }));
 
@@ -120,12 +123,10 @@ export default function AllProductsPage() {
   const toggleSection = (key: "category" | "price" | "color" | "size") =>
     setOpenSections((prev) => ({ ...prev, [key]: !prev[key] }));
 
-  // Xử lý Slider Giá Tùy Chọn
   const [showCustomPrice, setShowCustomPrice] = useState(false);
   const [tempMinPrice, setTempMinPrice] = useState(0);
-  const [tempMaxPrice, setTempMaxPrice] = useState(100000000); // Đặt mặc định cao để tránh lỗi lúc đầu
+  const [tempMaxPrice, setTempMaxPrice] = useState(100000000);
 
-  // FIX QUAN TRỌNG: Cập nhật lại max price cho thanh kéo khi data Database đã được load
   useEffect(() => {
     if (maxProductPrice > 0) {
       setTempMaxPrice(maxProductPrice);
@@ -140,7 +141,6 @@ export default function AllProductsPage() {
     }
   }, [showCustomPrice, tempMinPrice, tempMaxPrice, setCustomPrice]);
 
-  // Màn hình loading khi đang tải data (Tránh lỗi hook tính nhầm mảng rỗng)
   if (isLoading) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-white">
@@ -154,7 +154,6 @@ export default function AllProductsPage() {
 
   return (
     <main className="min-h-screen bg-white text-gray-800">
-      {/* Banner Hình ảnh */}
       <div className="w-full relative aspect-[21/9] md:aspect-[1920/400] bg-gray-100 overflow-hidden">
         <Image
           src="/images/banner-products.jpg"
@@ -191,7 +190,6 @@ export default function AllProductsPage() {
           </div>
         </div>
 
-        {/* Tags đang lọc */}
         {(filters.categories.length > 0 ||
           filters.priceRanges.length > 0 ||
           customPrice) && (
@@ -227,7 +225,6 @@ export default function AllProductsPage() {
         )}
 
         <div className="flex flex-col lg:flex-row gap-8">
-          {/* Sidebar BỘ LỌC */}
           <aside className="w-full lg:w-[240px] shrink-0">
             <div className="sticky top-24 space-y-5">
               <h2 className="font-bold text-xl text-gray-900 border-b-2 border-gray-900 pb-2 mb-6">
@@ -287,7 +284,6 @@ export default function AllProductsPage() {
                     </label>
                   ))}
 
-                  {/* Slider Tuỳ Chọn */}
                   <div className="pt-4 border-t border-gray-100 mt-4">
                     <label className="flex items-center space-x-3 cursor-pointer group mb-4">
                       <input
@@ -348,7 +344,6 @@ export default function AllProductsPage() {
             </div>
           </aside>
 
-          {/* Grid Sản phẩm */}
           <section className="flex-1">
             {paginatedProducts.length === 0 ? (
               <div className="py-20 text-center text-gray-500 border-2 border-dashed border-gray-100 rounded-3xl">
@@ -356,23 +351,49 @@ export default function AllProductsPage() {
               </div>
             ) : (
               <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-                {paginatedProducts.map((product) => (
+                {paginatedProducts.map((product: any) => (
                   <div
                     key={product.id}
                     className="group bg-white rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col"
                   >
                     <div className="relative aspect-square overflow-hidden bg-gray-50">
-                      <Image
-                        src={product.imageUrl || "/images/placeholder.jpg"}
-                        alt={product.name}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
+                      <Link href={`/products/${product.slug}`}>
+                        <Image
+                          src={product.imageUrl || "/images/placeholder.jpg"}
+                          alt={product.name}
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                      </Link>
                       {product.discountPercent > 0 && (
                         <span className="absolute top-2 left-2 bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded-md z-20">
                           -{product.discountPercent}%
                         </span>
                       )}
+
+                      {/* --- NÚT THÊM VÀO GIỎ HÀNG (HIỆN KHI HOVER) --- */}
+                      <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-4 pointer-events-none">
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault(); // Ngăn chuyển trang khi click nút
+                            e.stopPropagation();
+                            addItem({
+                              id: product.id,
+                              name: product.name,
+                              price: product.price,
+                              imageUrl:
+                                product.imageUrl || "/images/placeholder.jpg",
+                              slug: product.slug,
+                              quantity: 1,
+                            });
+                            alert(`Đã thêm ${product.name} vào giỏ hàng!`);
+                          }}
+                          className="bg-white text-gray-900 px-4 py-2 rounded-full font-medium text-sm flex items-center gap-2 hover:bg-orange-500 hover:text-white transition-colors shadow-lg transform translate-y-4 group-hover:translate-y-0 duration-300 pointer-events-auto"
+                        >
+                          <ShoppingCart size={16} /> Thêm vào giỏ
+                        </button>
+                      </div>
+                      {/* ------------------------------------------- */}
                     </div>
                     <div className="p-3 md:p-4 flex flex-col flex-grow">
                       <Link
@@ -398,7 +419,6 @@ export default function AllProductsPage() {
               </div>
             )}
 
-            {/* Pagination */}
             {totalPages > 1 && (
               <div className="mt-12 flex justify-center items-center space-x-2">
                 {Array.from({ length: totalPages }).map((_, i) => (
@@ -419,7 +439,6 @@ export default function AllProductsPage() {
           </section>
         </div>
 
-        {/* Footer Slogan */}
         <div className="mt-20 py-10 border-t border-gray-100 flex flex-col items-center">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 w-full max-w-4xl text-center">
             <div className="flex flex-col items-center space-y-2 group">
