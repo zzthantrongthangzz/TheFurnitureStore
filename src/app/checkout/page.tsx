@@ -43,34 +43,27 @@ export default function CheckoutPage() {
     setIsSubmitting(true);
 
     try {
-      // Gói dữ liệu chuẩn bị gửi lên Server
       const orderData = {
         customerInfo: formData,
         items: items,
         totalAmount: cartTotal,
       };
 
-      // TẠM THỜI: In ra console để kiểm tra dữ liệu
-      console.log("Dữ liệu chuẩn bị gửi đi:", orderData);
+      // GỌI API ĐỂ BẮN DỮ LIỆU LÊN SERVER
+      const response = await fetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(orderData),
+      });
 
-      /* ========================================================
-         PHẦN NÀY SẼ MỞ KHÓA Ở BƯỚC SAU KHI CHÚNG TA VIẾT API
-         
-         const response = await fetch('/api/orders', {
-           method: 'POST',
-           headers: { 'Content-Type': 'application/json' },
-           body: JSON.stringify(orderData)
-         });
+      if (!response.ok) {
+        throw new Error("Lỗi mạng hoặc lỗi server");
+      }
 
-         if (!response.ok) throw new Error("Lỗi khi đặt hàng");
-         ======================================================== */
-
-      // Giả lập thời gian server xử lý (1.5 giây)
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
+      // Xử lý khi thành công
       alert("Đặt hàng thành công! Chúng tôi sẽ liên hệ với bạn sớm nhất.");
-      clearCart(); // Xóa giỏ hàng sau khi đặt thành công
-      router.push("/"); // Chuyển hướng về trang chủ
+      clearCart(); // Dọn sạch giỏ hàng Zustand
+      router.push("/"); // Về trang chủ
     } catch (error) {
       console.error("Lỗi:", error);
       alert("Có lỗi xảy ra khi đặt hàng. Vui lòng thử lại.");
