@@ -60,6 +60,7 @@ const FilterAccordion = ({
 
 export default function AllProductsPage() {
   // Fix lỗi TypeScript never[] bằng cách khai báo rõ kiểu any[] (hoặc Product[])
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [productsFromDB, setProductsFromDB] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -148,6 +149,7 @@ export default function AllProductsPage() {
   // FIX QUAN TRỌNG: Cập nhật lại max price cho thanh kéo khi data Database đã được load
   useEffect(() => {
     if (maxProductPrice > 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setTempMaxPrice(maxProductPrice);
     }
   }, [maxProductPrice]);
@@ -388,11 +390,11 @@ export default function AllProductsPage() {
                         fill
                         className="object-cover group-hover:scale-105 transition-transform duration-500"
                       />
-                      {product.discountPercent > 0 && (
+                      {product.discountPercent ? (
                         <span className="absolute top-2 left-2 bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded-md z-20">
                           -{product.discountPercent}%
                         </span>
-                      )}
+                      ) : null}
                     </div>
                     <div className="p-3 md:p-4 flex flex-col flex-grow">
                       <Link
