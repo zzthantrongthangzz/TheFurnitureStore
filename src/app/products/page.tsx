@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { mockProducts } from "@/data/mockProducts";
 import Image from "next/image";
 import Link from "next/link";
 import { useProductFilter } from "@/hooks/useProductFilter";
@@ -62,31 +63,50 @@ export default function AllProductsPage() {
   const [productsFromDB, setProductsFromDB] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Lấy dữ liệu từ MongoDB thông qua API Route
+  //để dành
+  // // Lấy dữ liệu từ MongoDB thông qua API Route
+  // useEffect(() => {
+  //   const fetchProducts = async () => {
+  //     try {
+  //       setIsLoading(true);
+  //       const response = await fetch("/api/products");
+  //       const data = await response.json();
+
+  //       // KIỂM TRA AN TOÀN: Nếu data là mảng thì mới thực hiện map
+  //       if (Array.isArray(data)) {
+  //         const formattedData = data.map((p: any) => ({
+  //           ...p,
+  //           // Xử lý an toàn trường hợp thiếu _id
+  //           id: p._id?.toString() || p.id || Math.random().toString(),
+  //         }));
+
+  //         setProductsFromDB(formattedData);
+  //       } else {
+  //         console.error("Dữ liệu API không phải là mảng:", data);
+  //         setProductsFromDB([]);
+  //       }
+  //     } catch (error) {
+  //       console.error("Lỗi kết nối hoặc lỗi server:", error);
+  //       setProductsFromDB([]);
+  //     } finally {
+  //       setIsLoading(false);
+  //     }
+  //   };
+
+  //   fetchProducts();
+  // }, []);
+
   useEffect(() => {
     const fetchProducts = async () => {
+      setIsLoading(true);
       try {
-        setIsLoading(true);
-        const response = await fetch("/api/products");
-        const data = await response.json();
-
-        // KIỂM TRA AN TOÀN: Nếu data là mảng thì mới thực hiện map
-        if (Array.isArray(data)) {
-          const formattedData = data.map((p: any) => ({
-            ...p,
-            // Xử lý an toàn trường hợp thiếu _id
-            id: p._id?.toString() || p.id || Math.random().toString(),
-          }));
-
-          setProductsFromDB(formattedData);
-        } else {
-          console.error("Dữ liệu API không phải là mảng:", data);
-          setProductsFromDB([]);
-        }
+        setTimeout(() => {
+          setProductsFromDB(mockProducts);
+          setIsLoading(false);
+        }, 400);
       } catch (error) {
-        console.error("Lỗi kết nối hoặc lỗi server:", error);
+        console.error("Lỗi tải dữ liệu:", error);
         setProductsFromDB([]);
-      } finally {
         setIsLoading(false);
       }
     };
