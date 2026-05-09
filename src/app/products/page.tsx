@@ -12,13 +12,11 @@ import {
   ShieldCheck,
   Headphones,
   Truck,
-  ShoppingCart, // Đã import thêm icon giỏ hàng
+  ShoppingCart,
 } from "lucide-react";
 
-// ĐÃ IMPORT STORE GIỎ HÀNG
 import { useCart } from "@/hooks/useCart";
 
-// Danh sách map tên tiếng Việt có dấu chuẩn xác
 const CATEGORIES = [
   { label: "Bộ Sưu Tập", val: "bo-suu-tap" },
   { label: "Phòng Ngủ", val: "phong-ngu" },
@@ -65,38 +63,58 @@ export default function AllProductsPage() {
   const [productsFromDB, setProductsFromDB] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // GỌI HÀM THÊM VÀO GIỎ HÀNG TỪ STORE
   const addItem = useCart((state) => state.addItem);
 
   useEffect(() => {
+    const abortController = new AbortController();
+
     const fetchProducts = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch("/api/products");
+        const response = await fetch(`/api/products?timestamp=${Date.now()}`, {
+          signal: abortController.signal,
+          cache: "no-store",
+        });
+
+        if (!response.ok) {
+          throw new Error("Lỗi khi tải dữ liệu từ server");
+        }
+
         const data = await response.json();
 
-        if (Array.isArray(data)) {
-          const formattedData = data.map((p: any) => ({
-            ...p,
-            id: p._id?.toString() || p.id || Math.random().toString(),
-          }));
-
-          setProductsFromDB(formattedData);
-        } else {
-          console.error("Dữ liệu API không phải là mảng:", data);
+        if (!abortController.signal.aborted) {
+          if (Array.isArray(data)) {
+            const formattedData = data.map((p: any) => ({
+              ...p,
+              // ĐÃ SỬA LỖI 1: Thay Math.random() bằng p.slug để tránh lỗi Hydration
+              id: p._id?.toString() || p.id || p.slug,
+            }));
+            setProductsFromDB(formattedData);
+          } else {
+            console.error("Dữ liệu API không phải là mảng:", data);
+            setProductsFromDB([]);
+          }
+        }
+      } catch (error: any) {
+        if (error.name === "AbortError") {
+          return;
+        }
+        console.error("Lỗi kết nối hoặc lỗi server:", error);
+        if (!abortController.signal.aborted) {
           setProductsFromDB([]);
         }
-      } catch (error) {
-        console.error("Lỗi kết nối hoặc lỗi server:", error);
-        setProductsFromDB([]);
       } finally {
-        setIsLoading(false);
+        if (!abortController.signal.aborted) {
+          setIsLoading(false);
+        }
       }
     };
 
     fetchProducts();
+    return () => {
+      abortController.abort();
+    };
   }, []);
-
   const {
     filters,
     toggleFilter,
@@ -236,7 +254,8 @@ export default function AllProductsPage() {
                 isOpen={openSections.category}
                 onToggle={() => toggleSection("category")}
               >
-                <ul className="space-y-3 text-sm text-gray-600">
+                {/* ĐÃ SỬA LỖI 2: Đổi <ul> thành <div> */}
+                <div className="space-y-3 text-sm text-gray-600">
                   {CATEGORIES.map((cat) => (
                     <label
                       key={cat.val}
@@ -253,7 +272,7 @@ export default function AllProductsPage() {
                       </span>
                     </label>
                   ))}
-                </ul>
+                </div>
               </FilterAccordion>
 
               <FilterAccordion
@@ -351,17 +370,24 @@ export default function AllProductsPage() {
               </div>
             ) : (
               <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-                {paginatedProducts.map((product: any) => (
+                {paginatedProducts.map((product: any, index: number) => (
                   <div
                     key={product.id}
                     className="group bg-white rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col"
                   >
                     <div className="relative aspect-square overflow-hidden bg-gray-50">
-                      <Link href={`/products/${product.slug}`}>
+                      {/* ĐÃ SỬA LỖI 3: Thêm prefetch={false} vào Link ảnh */}
+                      <Link
+                        href={`/products/${product.slug}`}
+                        prefetch={false}
+                        className="relative block w-full h-full"
+                      >
                         <Image
                           src={product.imageUrl || "/images/placeholder.jpg"}
                           alt={product.name}
                           fill
+                          sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                          priority={index < 4}
                           className="object-cover group-hover:scale-105 transition-transform duration-500"
                         />
                       </Link>
@@ -371,11 +397,10 @@ export default function AllProductsPage() {
                         </span>
                       )}
 
-                      {/* --- NÚT THÊM VÀO GIỎ HÀNG (HIỆN KHI HOVER) --- */}
                       <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-4 pointer-events-none">
                         <button
                           onClick={(e) => {
-                            e.preventDefault(); // Ngăn chuyển trang khi click nút
+                            e.preventDefault();
                             e.stopPropagation();
                             addItem({
                               id: product.id,
@@ -396,8 +421,10 @@ export default function AllProductsPage() {
                       {/* ------------------------------------------- */}
                     </div>
                     <div className="p-3 md:p-4 flex flex-col flex-grow">
+                      {/* ĐÃ SỬA LỖI 3: Thêm prefetch={false} vào Link tên sản phẩm */}
                       <Link
                         href={`/products/${product.slug}`}
+                        prefetch={false}
                         className="font-medium text-sm md:text-base text-gray-800 hover:text-orange-600 line-clamp-2 min-h-[2.5rem] transition mb-2"
                       >
                         {product.name}
