@@ -130,6 +130,7 @@ export default function CheckoutPage() {
           note: formData.note,
         },
         items: items.map(item => ({
+          id: item.id,
           productId: item.id,
           name: item.name,
           price: item.price,
