@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import { signIn } from "next-auth/react";
-import { Mail, Lock, Eye, EyeOff, X, Loader2 } from "lucide-react";
+import Link from "next/link";
+import { Mail, Lock, Eye, EyeOff, X } from "lucide-react";
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -16,43 +16,9 @@ export default function LoginForm({
   onSwitchToRegister,
 }: LoginModalProps) {
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
 
   if (!isOpen) return null;
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setErrorMsg("");
-
-    try {
-      const result = await signIn("credentials", {
-        redirect: false,
-        email,
-        password,
-      });
-
-      // Nếu có lỗi (Sai pass, sai email, hoặc lỗi server)
-      if (result?.error) {
-        setErrorMsg(result.error);
-        return; // DỪNG LẠI NGAY, KHÔNG chạy code báo thành công bên dưới
-      }
-
-      // Chỉ báo thành công khi result.ok là true
-      if (result?.ok) {
-        alert("Đăng nhập thành công!");
-        onClose();
-        window.location.reload();
-      }
-    } catch (err) {
-      setErrorMsg("Lỗi hệ thống, vui lòng thử lại!");
-    } finally {
-      setIsLoading(false);
-    }
-  };
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm px-4">
       <div className="absolute inset-0" onClick={onClose}></div>
@@ -71,13 +37,7 @@ export default function LoginForm({
           </p>
         </div>
 
-        {errorMsg && (
-          <div className="mb-6 p-3 bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg text-center font-medium">
-            {errorMsg}
-          </div>
-        )}
-
-        <form className="space-y-5" onSubmit={handleSubmit}>
+        <form className="space-y-5" onSubmit={(e) => e.preventDefault()}>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Email
@@ -86,8 +46,6 @@ export default function LoginForm({
               <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
               <input
                 type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
                 className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 outline-none text-black"
                 placeholder="nhapemail@domain.com"
                 required
@@ -103,8 +61,6 @@ export default function LoginForm({
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
               <input
                 type={showPassword ? "text" : "password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
                 className="w-full pl-10 pr-12 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 outline-none text-black"
                 placeholder="••••••••"
                 required
@@ -119,18 +75,8 @@ export default function LoginForm({
             </div>
           </div>
 
-          <button
-            disabled={isLoading}
-            className="w-full bg-gray-900 text-white font-bold py-3 rounded-lg hover:bg-orange-500 transition duration-300 flex items-center justify-center space-x-2 disabled:bg-gray-400"
-          >
-            {isLoading ? (
-              <>
-                <Loader2 className="animate-spin" size={20} />{" "}
-                <span>Đang kiểm tra...</span>
-              </>
-            ) : (
-              "Đăng nhập"
-            )}
+          <button className="w-full bg-gray-900 text-white font-bold py-3 rounded-lg hover:bg-orange-500 transition duration-300">
+            Đăng nhập
           </button>
         </form>
 
