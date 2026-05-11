@@ -1,6 +1,7 @@
+// src/app/admin/layout.tsx
 import React from "react";
 import Link from "next/link";
-import { Package, PlusCircle, Home } from "lucide-react";
+import { Package, PlusCircle, Home, ClipboardList } from "lucide-react"; // Đã thêm ClipboardList ở đây
 
 export default function AdminLayout({
   children,
@@ -17,12 +18,24 @@ export default function AdminLayout({
           </h2>
         </div>
         <nav className="flex-1 p-4 space-y-2">
+          
+          {/* 1. Nút Quản lý đơn hàng (MỚI THÊM) */}
+          <Link
+            href="/admin/orders"
+            className="flex items-center gap-3 p-3 hover:bg-orange-50 hover:text-orange-600 text-gray-600 font-medium rounded-lg transition"
+          >
+            <ClipboardList size={20} /> Quản lý đơn hàng
+          </Link>
+
+          {/* 2. Nút Danh sách sản phẩm */}
           <Link
             href="/admin/products"
             className="flex items-center gap-3 p-3 hover:bg-orange-50 hover:text-orange-600 text-gray-600 font-medium rounded-lg transition"
           >
             <Package size={20} /> Danh sách sản phẩm
           </Link>
+          
+          {/* 3. Nút Thêm sản phẩm mới */}
           <Link
             href="/admin/products/add"
             className="flex items-center gap-3 p-3 hover:bg-orange-50 hover:text-orange-600 text-gray-600 font-medium rounded-lg transition"
