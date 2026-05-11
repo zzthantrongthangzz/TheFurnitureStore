@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation"; // Hook để lấy đường dẫn hiện tại
 import {
@@ -19,6 +19,9 @@ import {
   newsCategories,
 } from "@/data/navData";
 
+// IMPORT store giỏ hàng của bạn vào đây
+import { useCart } from "@/hooks/useCart";
+
 const navItems = [
   { label: "Sản phẩm", href: "/products", hasDropdown: true },
   { label: "Thiết kế - Thi công", href: "/design" },
@@ -33,6 +36,25 @@ const Navbar = () => {
   const [activeModal, setActiveModal] = useState<"none" | "login" | "register">(
     "none",
   );
+
+  // --- LOGIC XỬ LÝ GIỎ HÀNG (MỚI THÊM) ---
+  const [isMounted, setIsMounted] = useState(false);
+  const cartItems = useCart((state) => state.items);
+
+  // useEffect này giúp fix lỗi lệch giao diện (Hydration) giữa Server và Client của Next.js
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  // Tính tổng số lượng sản phẩm trong giỏ
+  const totalItems = cartItems.reduce(
+    (total, item) => total + item.quantity,
+    0,
+  );
+
+  // Nếu chưa render xong (isMounted = false), hiện số 0 để tránh lỗi Next.js
+  const displayCartCount = isMounted ? totalItems : 0;
+  // --------------------------------------
 
   return (
     <>
@@ -97,7 +119,8 @@ const Navbar = () => {
                   }`}
                 />
                 <span className="absolute -top-1.5 -right-1.5 bg-orange-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
-                  0
+                  {/* THAY ĐỔI SỐ 0 BẰNG BIẾN displayCartCount */}
+                  {displayCartCount}
                 </span>
               </div>
               <span>Giỏ hàng</span>
