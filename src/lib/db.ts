@@ -1,9 +1,9 @@
 import mongoose from "mongoose";
 
-const MONGODB_URI = process.env.MONGODB_URI;
+const MONGODB_URI = process.env.MONGODB_URI!;
 
 if (!MONGODB_URI) {
-  throw new Error("Vui lòng định nghĩa biến MONGODB_URI trong file .env.local");
+  throw new Error("Vui lòng định nghĩa MONGODB_URI trong file .env");
 }
 
 let cached = (global as any).mongoose;
@@ -12,7 +12,7 @@ if (!cached) {
   cached = (global as any).mongoose = { conn: null, promise: null };
 }
 
-export async function connectToDatabase() {
+export const connectToDatabase = async () => {
   if (cached.conn) {
     return cached.conn;
   }
@@ -22,8 +22,7 @@ export async function connectToDatabase() {
       bufferCommands: false,
     };
 
-    cached.promise = mongoose.connect(MONGODB_URI!, opts).then((mongoose) => {
-      console.log("✅ Đã kết nối tới MongoDB thành công!");
+    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
       return mongoose;
     });
   }
@@ -36,4 +35,4 @@ export async function connectToDatabase() {
   }
 
   return cached.conn;
-}
+};
