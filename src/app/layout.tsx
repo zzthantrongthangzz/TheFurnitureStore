@@ -23,7 +23,7 @@ export default function RootLayout({
         {/* 2. Bọc toàn bộ ứng dụng bên trong NextAuthProvider */}
         <NextAuthProvider>
           <Navbar />
-          <Breadcrumb />
+          {/* <Breadcrumb /> */}
           <main className="flex-grow">{children}</main>
           <Footer />
         </NextAuthProvider>

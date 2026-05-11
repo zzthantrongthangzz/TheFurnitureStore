@@ -9,7 +9,7 @@ import {
   ShoppingBag,
   Search,
   ChevronDown,
-  ChevronRight,
+  ChevronRight, 
 } from "lucide-react";
 import LoginForm from "./LoginForm";
 import RegisterForm from "./RegisterForm";
@@ -104,6 +104,15 @@ const Navbar = () => {
 
           {/* User Actions & Cart */}
           <div className="flex items-center space-x-6 text-sm">
+            {/* THÊM NÚT ADMIN: Chỉ hiện khi đăng nhập và có role là admin */}
+            {session?.user?.role === "admin" && (
+              <Link 
+                href="/admin/products/add" 
+                className="text-orange-600 font-bold hover:underline bg-orange-50 px-3 py-1.5 rounded-md border border-orange-200"
+              >
+                Trang Quản Trị
+              </Link>
+            )}
             {session ? (
               // NẾU ĐÃ ĐĂNG NHẬP: Hiển thị tên (Đã kéo dài độ rộng)
               <div className="relative group">
