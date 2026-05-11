@@ -6,19 +6,11 @@ export interface SubCategory {
 export interface MenuCategory {
   title: string;
   href: string;
-  items?: SubCategory[];
+  items?: SubCategory[]; 
 }
 
-export interface SubItem {
-  name: string;
-  href: string;
-}
-
-export interface MenuItem {
-  title: string;
-  href: string;
-  items?: SubItem[]; // Cấp 2
-}
+export type MenuItem = MenuCategory;
+export type SubItem = SubCategory;
 
 export const productCategories: MenuCategory[] = [
   {
@@ -96,7 +88,6 @@ export const promotionCategories: MenuItem[] = [
   { title: "3T Outlet - Hàng Thanh Lý", href: "/promotions/outlet" },
 ];
 
-// Dữ liệu cho Tin tức
 export const newsCategories: MenuItem[] = [
   { title: "Tips", href: "/news/tips" },
   {

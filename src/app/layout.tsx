@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Navbar from "@/components/ui/Navbar"; // Import Navbar
 import Footer from "@/components/ui/Footer"; // Import Footer
+import Breadcrumb from "@/components/ui/Breadcrumb";
 
 export const metadata: Metadata = {
   title: "Cửa hàng Nội thất 3T Home",
@@ -17,7 +18,7 @@ export default function RootLayout({
     <html lang="vi">
       <body className="flex flex-col min-h-screen bg-gray-50">
         <Navbar />
-        {/* Phần nội dung của từng trang sẽ hiển thị ở thẻ main này */}
+        <Breadcrumb />
         <main className="flex-grow">{children}</main>
         <Footer />
       </body>
