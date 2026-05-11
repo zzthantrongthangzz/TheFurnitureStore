@@ -1,7 +1,13 @@
-// src/hooks/useCart.ts
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
-import { CartItem } from "@/types/cart";
+
+interface CartItem {
+  id: string;
+  slug: string;
+  name: string;
+  price: number;
+  imageUrl: string;
+  quantity: number;
+}
 
 interface CartStore {
   items: CartItem[];
@@ -9,48 +15,41 @@ interface CartStore {
   removeItem: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
+  setItems: (items: CartItem[]) => void; // Hàm mới để load data từ DB
 }
 
-export const useCart = create(
-  persist<CartStore>(
-    (set) => ({
-      items: [],
+export const useCart = create<CartStore>((set) => ({
+  items: [],
 
-      addItem: (newItem) =>
-        set((state) => {
-          const existingItem = state.items.find(
-            (item) => item.id === newItem.id,
-          );
-          if (existingItem) {
-            return {
-              items: state.items.map((item) =>
-                item.id === newItem.id
-                  ? { ...item, quantity: item.quantity + newItem.quantity }
-                  : item,
-              ),
-            };
-          }
-          return { items: [...state.items, newItem] };
-        }),
+  // Hàm này dùng để nạp giỏ hàng từ Database sau khi đăng nhập thành công
+  setItems: (items) => set({ items }),
 
-      removeItem: (id) =>
-        set((state) => ({
-          items: state.items.filter((item) => item.id !== id),
-        })),
-
-      updateQuantity: (id, quantity) =>
-        set((state) => ({
-          items: state.items.map((item) =>
-            item.id === id
-              ? { ...item, quantity: Math.max(1, quantity) }
-              : item,
+  addItem: (item) =>
+    set((state) => {
+      const existingItem = state.items.find((i) => i.id === item.id);
+      if (existingItem) {
+        return {
+          items: state.items.map((i) =>
+            i.id === item.id
+              ? { ...i, quantity: i.quantity + item.quantity }
+              : i,
           ),
-        })),
-
-      clearCart: () => set({ items: [] }),
+        };
+      }
+      return { items: [...state.items, item] };
     }),
-    {
-      name: "furniture-cart",
-    },
-  ),
-);
+
+  removeItem: (id) =>
+    set((state) => ({
+      items: state.items.filter((item) => item.id !== id),
+    })),
+
+  updateQuantity: (id, quantity) =>
+    set((state) => ({
+      items: state.items.map((item) =>
+        item.id === id ? { ...item, quantity } : item,
+      ),
+    })),
+
+  clearCart: () => set({ items: [] }),
+}));
