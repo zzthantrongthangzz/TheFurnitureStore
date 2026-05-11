@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useProductFilter } from "@/hooks/useProductFilter";
+import { useCart } from "@/hooks/useCart";
 import {
   ChevronDown,
   X,
@@ -14,8 +15,6 @@ import {
   Truck,
   ShoppingCart,
 } from "lucide-react";
-
-import { useCart } from "@/hooks/useCart";
 
 const CATEGORIES = [
   { label: "Bộ Sưu Tập", val: "bo-suu-tap" },
@@ -60,6 +59,8 @@ const FilterAccordion = ({
 );
 
 export default function AllProductsPage() {
+  // --- ĐÃ CHỌN CODE TỪ NHÁNH DEVELOP ---
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [productsFromDB, setProductsFromDB] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -69,8 +70,8 @@ export default function AllProductsPage() {
     const abortController = new AbortController();
 
     const fetchProducts = async () => {
+      setIsLoading(true);
       try {
-        setIsLoading(true);
         const response = await fetch(`/api/products?timestamp=${Date.now()}`, {
           signal: abortController.signal,
           cache: "no-store",
@@ -84,9 +85,9 @@ export default function AllProductsPage() {
 
         if (!abortController.signal.aborted) {
           if (Array.isArray(data)) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const formattedData = data.map((p: any) => ({
               ...p,
-              // ĐÃ SỬA LỖI 1: Thay Math.random() bằng p.slug để tránh lỗi Hydration
               id: p._id?.toString() || p.id || p.slug,
             }));
             setProductsFromDB(formattedData);
@@ -115,6 +116,7 @@ export default function AllProductsPage() {
       abortController.abort();
     };
   }, []);
+
   const {
     filters,
     toggleFilter,
@@ -254,7 +256,6 @@ export default function AllProductsPage() {
                 isOpen={openSections.category}
                 onToggle={() => toggleSection("category")}
               >
-                {/* ĐÃ SỬA LỖI 2: Đổi <ul> thành <div> */}
                 <div className="space-y-3 text-sm text-gray-600">
                   {CATEGORIES.map((cat) => (
                     <label
@@ -370,13 +371,14 @@ export default function AllProductsPage() {
               </div>
             ) : (
               <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                 {paginatedProducts.map((product: any, index: number) => (
                   <div
                     key={product.id}
                     className="group bg-white rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col"
                   >
                     <div className="relative aspect-square overflow-hidden bg-gray-50">
-                      {/* ĐÃ SỬA LỖI 3: Thêm prefetch={false} vào Link ảnh */}
+                      {/* --- ĐÃ CHỌN THẺ LINK CHỨA HÌNH ẢNH VÀ NÚT ADD TỪ NHÁNH DEVELOP --- */}
                       <Link
                         href={`/products/${product.slug}`}
                         prefetch={false}
@@ -406,8 +408,7 @@ export default function AllProductsPage() {
                               id: product.id,
                               name: product.name,
                               price: product.price,
-                              imageUrl:
-                                product.imageUrl || "/images/placeholder.jpg",
+                              imageUrl: product.imageUrl || "/images/placeholder.jpg",
                               slug: product.slug,
                               quantity: 1,
                             });
@@ -418,10 +419,8 @@ export default function AllProductsPage() {
                           <ShoppingCart size={16} /> Thêm vào giỏ
                         </button>
                       </div>
-                      {/* ------------------------------------------- */}
                     </div>
                     <div className="p-3 md:p-4 flex flex-col flex-grow">
-                      {/* ĐÃ SỬA LỖI 3: Thêm prefetch={false} vào Link tên sản phẩm */}
                       <Link
                         href={`/products/${product.slug}`}
                         prefetch={false}

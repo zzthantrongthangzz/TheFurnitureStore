@@ -17,6 +17,8 @@ import {
   productCategories,
   promotionCategories,
   newsCategories,
+  MenuItem,
+  SubItem,
 } from "@/data/navData";
 
 // IMPORT store giỏ hàng của bạn vào đây
@@ -163,9 +165,9 @@ const Navbar = () => {
                   )}
                 </Link>
 
-                {/* Mega Menu Dropdown */}
+                {/* Mega Menu Dropdown Cải Tiến */}
                 {item.hasDropdown && (
-                  <div className="absolute left-0 top-full w-56 bg-white shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 ease-in-out border border-gray-100 z-50">
+                  <div className="absolute top-full left-0 w-64 bg-white shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 ease-in-out border border-gray-100 z-50 rounded-b-lg">
                     <ul className="flex flex-col py-2">
                       {(item.label === "Sản phẩm"
                         ? productCategories
@@ -174,13 +176,16 @@ const Navbar = () => {
                           : item.label === "Tin tức"
                             ? newsCategories
                             : []
-                      ).map((cat: any, idx: number) => (
+                      ).map((cat: MenuItem, idx: number) => (
                         <li key={idx} className="relative group/item">
+                          {/* Menu Cấp 2 */}
                           <Link
                             href={cat.href}
                             className="flex items-center justify-between px-6 py-3 text-gray-700 hover:text-orange-500 hover:bg-gray-50 transition"
                           >
-                            <span className="font-medium">{cat.title}</span>
+                            <span className="font-medium text-sm">
+                              {cat.title}
+                            </span>
                             {cat.items && (
                               <ChevronRight
                                 size={14}
@@ -189,10 +194,11 @@ const Navbar = () => {
                             )}
                           </Link>
 
+                          {/* Menu Cấp 3 (Mở sang bên phải) */}
                           {cat.items && (
-                            <div className="absolute left-full top-0 w-48 bg-white shadow-xl opacity-0 invisible group-hover/item:opacity-100 group-hover/item:visible transition-all duration-300 border border-gray-100">
+                            <div className="absolute left-full top-0 w-56 bg-white shadow-xl opacity-0 invisible group-hover/item:opacity-100 group-hover/item:visible transition-all duration-300 border border-gray-100 rounded-lg">
                               <ul className="flex flex-col py-2">
-                                {cat.items.map((sub: any, sIdx: number) => (
+                                {cat.items.map((sub: SubItem, sIdx: number) => (
                                   <li key={sIdx}>
                                     <Link
                                       href={sub.href}
