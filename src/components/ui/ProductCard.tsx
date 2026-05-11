@@ -4,11 +4,21 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ShoppingCart } from "lucide-react";
-import { Product } from "@/types";
 import { useCart } from "@/hooks/useCart";
 
+// 1. Cập nhật Interface để nhận thêm giá gốc và % giảm giá
+export interface MongoProduct {
+  _id: string;
+  name: string;
+  slug: string;
+  price: number;
+  originalPrice?: number; // Thêm trường này
+  discountPercent?: number; // Thêm trường này
+  imageUrl: string;
+}
+
 interface ProductCardProps {
-  product: Product;
+  product: MongoProduct;
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
@@ -19,32 +29,38 @@ export default function ProductCard({ product }: ProductCardProps) {
     e.stopPropagation();
 
     addItem({
-      id: product.id || (product as any)._id,
+      id: product._id,
       name: product.name,
-      price:
-        typeof product.price === "string"
-          ? parseInt(product.price.replace(/\D/g, ""))
-          : product.price,
-      imageUrl: product.image || (product as any).imageUrl,
-      slug: (product as any).slug || product.id,
+      price: product.price,
+      imageUrl: product.imageUrl,
+      slug: product.slug,
       quantity: 1,
     });
 
     alert(`Đã thêm ${product.name} vào giỏ hàng!`);
   };
 
-  const productSlug = (product as any).slug || product.id;
-
   return (
     <div className="min-w-[260px] max-w-[260px] snap-start group cursor-pointer relative flex flex-col">
-      <Link href={`/products/${productSlug}`} className="relative w-full h-[260px] overflow-hidden rounded-xl mb-4 bg-white shadow-sm block">
+      <Link
+        href={`/products/${product.slug}`}
+        className="relative w-full h-[260px] overflow-hidden rounded-xl mb-4 bg-white shadow-sm block"
+      >
         <Image
-          src={product.image || (product as any).imageUrl}
+          src={product.imageUrl}
           alt={product.name}
           fill
           className="object-cover group-hover:scale-105 transition-transform duration-500"
           sizes="260px"
         />
+
+        {/* 2. Badge hiển thị % giảm giá nằm ở góc trên bên phải ảnh */}
+        {product.discountPercent && product.discountPercent > 0 ? (
+          <div className="absolute top-3 right-3 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-md z-10 shadow-sm">
+            -{product.discountPercent}%
+          </div>
+        ) : null}
+
         <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-4 pointer-events-none">
           <button
             onClick={handleAddToCart}
@@ -54,18 +70,28 @@ export default function ProductCard({ product }: ProductCardProps) {
           </button>
         </div>
       </Link>
-      
-      <Link href={`/products/${productSlug}`} className="block">
+
+      <Link href={`/products/${product.slug}`} className="block">
         <h3 className="font-medium text-gray-800 group-hover:text-orange-600 transition-colors text-lg truncate">
           {product.name}
         </h3>
       </Link>
-      
-      <p className="text-orange-600 font-bold mt-1 text-lg">
-        {!isNaN(Number(product?.price))
-          ? `${Number(product.price).toLocaleString("vi-VN")}đ`
-          : product?.price || "Đang cập nhật"}
-      </p>
+
+      {/* 3. Vùng hiển thị giá tiền: Kết hợp Giá hiện tại và Giá gốc */}
+      <div className="flex items-baseline gap-2 mt-1">
+        <p className="text-orange-600 font-bold text-lg">
+          {product.price
+            ? `${product.price.toLocaleString("vi-VN")}đ`
+            : "Đang cập nhật"}
+        </p>
+
+        {/* Chỉ hiển thị giá gốc nếu có giá gốc và giá gốc lớn hơn giá bán */}
+        {product.originalPrice && product.originalPrice > product.price && (
+          <p className="text-gray-400 line-through text-sm font-medium">
+            {product.originalPrice.toLocaleString("vi-VN")}đ
+          </p>
+        )}
+      </div>
     </div>
   );
 }
