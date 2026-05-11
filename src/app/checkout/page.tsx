@@ -296,7 +296,12 @@ export default function CheckoutPage() {
                     Phương thức thanh toán
                   </h3>
                   <div className="space-y-3">
-                    <label className="flex items-center p-4 border border-gray-200 rounded-xl cursor-pointer hover:bg-orange-50/50 transition-colors">
+                    {/* 1. Thanh toán COD */}
+                    <label className={`flex items-center p-4 border rounded-xl cursor-pointer transition-all duration-200 ${
+                      formData.paymentMethod === "COD" 
+                        ? "border-orange-500 bg-orange-50/30" 
+                        : "border-gray-200 hover:bg-gray-50"
+                    }`}>
                       <input
                         type="radio"
                         name="paymentMethod"
@@ -309,18 +314,57 @@ export default function CheckoutPage() {
                         Thanh toán khi nhận hàng (COD)
                       </span>
                     </label>
-                    <label className="flex items-center p-4 border border-gray-200 rounded-xl cursor-pointer hover:bg-orange-50/50 transition-colors opacity-50">
+
+                    {/* 2. Chuyển khoản ngân hàng */}
+                    <label className={`flex items-center p-4 border rounded-xl cursor-pointer transition-all duration-200 ${
+                      formData.paymentMethod === "BANK_TRANSFER" 
+                        ? "border-orange-500 bg-orange-50/30" 
+                        : "border-gray-200 hover:bg-gray-50"
+                    }`}>
                       <input
                         type="radio"
                         name="paymentMethod"
                         value="BANK_TRANSFER"
-                        disabled
+                        checked={formData.paymentMethod === "BANK_TRANSFER"}
+                        onChange={handleInputChange}
                         className="w-5 h-5 text-orange-500 focus:ring-orange-500 border-gray-300"
                       />
                       <span className="ml-3 font-medium text-gray-700">
-                        Chuyển khoản ngân hàng (Đang bảo trì)
+                        Chuyển khoản ngân hàng
                       </span>
                     </label>
+
+                    {/* 3. Bảng thông tin hiện ra NẾU khách chọn Chuyển khoản */}
+                    {formData.paymentMethod === "BANK_TRANSFER" && (
+                      <div className="p-5 bg-blue-50 border border-blue-100 rounded-xl mt-3 transition-all">
+                        <h4 className="font-bold text-blue-800 mb-3 flex items-center gap-2">
+                          Thông tin tài khoản nhận tiền:
+                        </h4>
+                        <div className="space-y-2 text-sm text-blue-900">
+                          <p className="flex justify-between border-b border-blue-200/50 pb-2">
+                            <span>Ngân hàng:</span>
+                            <span className="font-bold">Vietcombank (VCB)</span>
+                          </p>
+                          <p className="flex justify-between border-b border-blue-200/50 pb-2">
+                            <span>Số tài khoản:</span>
+                            <span className="font-bold tracking-wider">0123 456 789</span>
+                          </p>
+                          <p className="flex justify-between border-b border-blue-200/50 pb-2">
+                            <span>Chủ tài khoản:</span>
+                            <span className="font-bold uppercase">CONG TY NOI THAT 3T HOME</span>
+                          </p>
+                          <p className="flex justify-between pt-1">
+                            <span>Nội dung CK:</span>
+                            <span className="font-bold text-orange-600">
+                              Thanh toan don hang - {formData.phone || "[Số điện thoại]"}
+                            </span>
+                          </p>
+                        </div>
+                        <p className="text-xs text-blue-600 italic mt-4 text-center">
+                          * Vui lòng chuyển khoản đúng số tiền và nội dung. Đơn hàng sẽ được xử lý ngay sau khi chúng tôi nhận được thanh toán.
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
               </form>
