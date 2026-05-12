@@ -5,15 +5,15 @@ import Image from "next/image";
 import Link from "next/link";
 import { ShoppingCart } from "lucide-react";
 import { useCart } from "@/hooks/useCart";
+import { useSession } from "next-auth/react"; // 1. Import hook kiểm tra đăng nhập
 
-// 1. Cập nhật Interface để nhận thêm giá gốc và % giảm giá
 export interface MongoProduct {
   _id: string;
   name: string;
   slug: string;
   price: number;
-  originalPrice?: number; // Thêm trường này
-  discountPercent?: number; // Thêm trường này
+  originalPrice?: number;
+  discountPercent?: number;
   imageUrl: string;
 }
 
@@ -22,22 +22,53 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
-  const addItem = useCart((state) => state.addItem);
+  // 2. Lấy danh sách items cũ và hàm addItem
+  const { items, addItem } = useCart();
+  // 3. Lấy thông tin đăng nhập của khách hàng
+  const { data: session } = useSession();
 
-  const handleAddToCart = (e: React.MouseEvent) => {
+  const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
-    addItem({
+    // LÕI BẢO MẬT: Kiểm tra xem đã đăng nhập chưa
+    if (!session) {
+      alert("Vui lòng đăng nhập hoặc đăng ký tài khoản để mua hàng nhé!");
+      return; // Dừng hàm ngay lập tức, không cho thêm vào giỏ
+    }
+
+    const newItem = {
       id: product._id,
       name: product.name,
       price: product.price,
       imageUrl: product.imageUrl,
       slug: product.slug,
       quantity: 1,
-    });
+    };
 
-    alert(`Đã thêm ${product.name} vào giỏ hàng!`);
+    // 4A. Cập nhật giao diện mượt mà ngay lập tức (Zustand)
+    addItem(newItem);
+
+    // 4B. Cấu trúc lại mảng items mới nhất để gửi lên Server
+    const updatedItems = [...items];
+    const existingIndex = updatedItems.findIndex((i) => i.id === product._id);
+    if (existingIndex > -1) {
+      updatedItems[existingIndex].quantity += 1;
+    } else {
+      updatedItems.push(newItem);
+    }
+
+    // 5. Ngầm gọi API lưu dữ liệu xuống MongoDB
+    try {
+      await fetch("/api/cart", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ items: updatedItems }),
+      });
+      alert(`Đã thêm ${product.name} vào giỏ hàng!`);
+    } catch (error) {
+      console.error("Lỗi đồng bộ giỏ hàng:", error);
+    }
   };
 
   return (
@@ -54,7 +85,6 @@ export default function ProductCard({ product }: ProductCardProps) {
           sizes="260px"
         />
 
-        {/* 2. Badge hiển thị % giảm giá nằm ở góc trên bên phải ảnh */}
         {product.discountPercent && product.discountPercent > 0 ? (
           <div className="absolute top-3 right-3 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-md z-10 shadow-sm">
             -{product.discountPercent}%
@@ -77,7 +107,6 @@ export default function ProductCard({ product }: ProductCardProps) {
         </h3>
       </Link>
 
-      {/* 3. Vùng hiển thị giá tiền: Kết hợp Giá hiện tại và Giá gốc */}
       <div className="flex items-baseline gap-2 mt-1">
         <p className="text-orange-600 font-bold text-lg">
           {product.price
@@ -85,7 +114,6 @@ export default function ProductCard({ product }: ProductCardProps) {
             : "Đang cập nhật"}
         </p>
 
-        {/* Chỉ hiển thị giá gốc nếu có giá gốc và giá gốc lớn hơn giá bán */}
         {product.originalPrice && product.originalPrice > product.price && (
           <p className="text-gray-400 line-through text-sm font-medium">
             {product.originalPrice.toLocaleString("vi-VN")}đ

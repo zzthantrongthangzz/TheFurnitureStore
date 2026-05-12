@@ -14,16 +14,51 @@ export default function CartPage() {
     setIsMounted(true);
   }, []);
 
+  // --- HÀM ĐỒNG BỘ LÊN MONGODB ---
+  const syncCartToDB = async (updatedItems: any[]) => {
+    try {
+      await fetch("/api/cart", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ items: updatedItems }),
+      });
+    } catch (error) {
+      console.error("Lỗi đồng bộ giỏ hàng:", error);
+    }
+  };
+
+  // --- XỬ LÝ NÚT TĂNG GIẢM SỐ LƯỢNG ---
+  const handleUpdateQuantity = (id: string, newQuantity: number) => {
+    if (newQuantity < 1) return; // Không cho phép số lượng nhỏ hơn 1
+
+    // 1. Cập nhật giao diện mượt mà (Zustand)
+    updateQuantity(id, newQuantity);
+
+    // 2. Chuẩn bị mảng mới và gửi lên DB
+    const updatedItems = items.map((item) =>
+      item.id === id ? { ...item, quantity: newQuantity } : item,
+    );
+    syncCartToDB(updatedItems);
+  };
+
+  // --- XỬ LÝ NÚT XÓA SẢN PHẨM ---
+  const handleRemoveItem = (id: string) => {
+    // 1. Xóa khỏi giao diện (Zustand)
+    removeItem(id);
+
+    // 2. Chuẩn bị mảng mới (đã lọc bỏ sản phẩm) và gửi lên DB
+    const updatedItems = items.filter((item) => item.id !== id);
+    syncCartToDB(updatedItems);
+  };
+
   if (!isMounted) {
-    // Tránh lỗi giao diện trong lúc chờ load dữ liệu
     return (
-      <div className="container mx-auto p-8 text-center">
+      <div className="container mx-auto p-8 text-center text-gray-500 font-medium">
         Đang tải giỏ hàng...
       </div>
     );
   }
 
-  // Tính tổng tiền
   const cartTotal = items.reduce(
     (total, item) => total + item.price * item.quantity,
     0,
@@ -112,9 +147,10 @@ export default function CartPage() {
                           <div className="flex items-center border border-gray-300 rounded">
                             <button
                               onClick={() =>
-                                updateQuantity(item.id, item.quantity - 1)
+                                handleUpdateQuantity(item.id, item.quantity - 1)
                               }
-                              className="px-3 py-1 text-gray-600 hover:bg-gray-100 transition"
+                              className="px-3 py-1 text-gray-600 hover:bg-gray-100 transition disabled:opacity-50"
+                              disabled={item.quantity <= 1} // Mờ nút đi nếu số lượng là 1
                             >
                               <Minus size={14} />
                             </button>
@@ -123,7 +159,7 @@ export default function CartPage() {
                             </span>
                             <button
                               onClick={() =>
-                                updateQuantity(item.id, item.quantity + 1)
+                                handleUpdateQuantity(item.id, item.quantity + 1)
                               }
                               className="px-3 py-1 text-gray-600 hover:bg-gray-100 transition"
                             >
@@ -134,7 +170,7 @@ export default function CartPage() {
                           <div className="flex">
                             <button
                               type="button"
-                              onClick={() => removeItem(item.id)}
+                              onClick={() => handleRemoveItem(item.id)}
                               className="font-medium text-red-500 hover:text-red-600 flex items-center transition"
                             >
                               <Trash2 size={18} className="mr-1" />
