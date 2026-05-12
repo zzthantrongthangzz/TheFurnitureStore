@@ -11,18 +11,24 @@ const connectDB = async () => {
 // HÀM PUT: Dùng để Admin cập nhật trạng thái đơn hàng
 export async function PUT(
   req: Request,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> } // 1. Định nghĩa params là một Promise
 ) {
   try {
     await connectDB();
+    
+    // 2. Await params để lấy ID (Khắc phục lỗi Next.js)
+    const resolvedParams = await context.params;
+    const orderId = resolvedParams.id;
+
+    // Lấy trạng thái mới mà Frontend gửi lên
     const body = await req.json();
     const { status } = body;
 
-    // Tìm đơn hàng theo ID và cập nhật trạng thái
+    // 3. Tìm đơn hàng theo ID và cập nhật
     const updatedOrder = await Order.findByIdAndUpdate(
-      params.id,
+      orderId,
       { status: status },
-      { new: true } // Trả về data mới sau khi cập nhật
+      { returnDocument: 'after' } // 4. Khắc phục cảnh báo vàng của Mongoose
     );
 
     if (!updatedOrder) {
