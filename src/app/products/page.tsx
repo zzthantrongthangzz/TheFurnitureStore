@@ -2,9 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import Link from "next/link";
+import ProductCard from "@/components/ui/ProductCard"; // Đã cập nhật đường dẫn vào thư mục ui
 import { useProductFilter } from "@/hooks/useProductFilter";
-import { useCart } from "@/hooks/useCart";
 import {
   ChevronDown,
   X,
@@ -13,17 +12,13 @@ import {
   ShieldCheck,
   Headphones,
   Truck,
-  ShoppingCart,
 } from "lucide-react";
 
 const CATEGORIES = [
-  { label: "Bộ Sưu Tập", val: "bo-suu-tap" },
   { label: "Phòng Ngủ", val: "phong-ngu" },
   { label: "Phòng Khách", val: "phong-khach" },
   { label: "Phòng Ăn", val: "phong-an" },
   { label: "Phòng Làm Việc", val: "phong-lam-viec" },
-  { label: "Tủ Bếp", val: "tu-bep" },
-  { label: "Nệm", val: "nem" },
 ];
 
 const FilterAccordion = ({
@@ -59,12 +54,8 @@ const FilterAccordion = ({
 );
 
 export default function AllProductsPage() {
-  // --- ĐÃ CHỌN CODE TỪ NHÁNH DEVELOP ---
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [productsFromDB, setProductsFromDB] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-
-  const addItem = useCart((state) => state.addItem);
 
   useEffect(() => {
     const abortController = new AbortController();
@@ -85,7 +76,6 @@ export default function AllProductsPage() {
 
         if (!abortController.signal.aborted) {
           if (Array.isArray(data)) {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const formattedData = data.map((p: any) => ({
               ...p,
               id: p._id?.toString() || p.id || p.slug,
@@ -186,7 +176,8 @@ export default function AllProductsPage() {
         <div className="absolute inset-0 bg-black/10 z-10" />
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* ĐÃ SỬA: Nới rộng max-w lên 1400px */}
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8 xl:py-12">
         <div className="mb-6 border-b border-gray-100 pb-4">
           <h1 className="text-3xl md:text-4xl font-bold uppercase tracking-wider mb-4 text-gray-900">
             Tất cả sản phẩm
@@ -244,8 +235,10 @@ export default function AllProductsPage() {
           </div>
         )}
 
-        <div className="flex flex-col lg:flex-row gap-8">
-          <aside className="w-full lg:w-[240px] shrink-0">
+        {/* ĐÃ SỬA: Tăng gap-8 lên gap-12 để thoáng hơn */}
+        <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
+          {/* Cố định chiều rộng sidebar bộ lọc */}
+          <aside className="w-full lg:w-[260px] shrink-0">
             <div className="sticky top-24 space-y-5">
               <h2 className="font-bold text-xl text-gray-900 border-b-2 border-gray-900 pb-2 mb-6">
                 BỘ LỌC
@@ -370,77 +363,10 @@ export default function AllProductsPage() {
                 Không tìm thấy sản phẩm nào phù hợp.
               </div>
             ) : (
-              <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                {paginatedProducts.map((product: any, index: number) => (
-                  <div
-                    key={product.id}
-                    className="group bg-white rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col"
-                  >
-                    <div className="relative aspect-square overflow-hidden bg-gray-50">
-                      {/* --- ĐÃ CHỌN THẺ LINK CHỨA HÌNH ẢNH VÀ NÚT ADD TỪ NHÁNH DEVELOP --- */}
-                      <Link
-                        href={`/products/${product.slug}`}
-                        prefetch={false}
-                        className="relative block w-full h-full"
-                      >
-                        <Image
-                          src={product.imageUrl || "/images/placeholder.jpg"}
-                          alt={product.name}
-                          fill
-                          sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
-                          priority={index < 4}
-                          className="object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                      </Link>
-                      {product.discountPercent > 0 && (
-                        <span className="absolute top-2 left-2 bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded-md z-20">
-                          -{product.discountPercent}%
-                        </span>
-                      )}
-
-                      <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-4 pointer-events-none">
-                        <button
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            addItem({
-                              id: product.id,
-                              name: product.name,
-                              price: product.price,
-                              imageUrl: product.imageUrl || "/images/placeholder.jpg",
-                              slug: product.slug,
-                              quantity: 1,
-                            });
-                            alert(`Đã thêm ${product.name} vào giỏ hàng!`);
-                          }}
-                          className="bg-white text-gray-900 px-4 py-2 rounded-full font-medium text-sm flex items-center gap-2 hover:bg-orange-500 hover:text-white transition-colors shadow-lg transform translate-y-4 group-hover:translate-y-0 duration-300 pointer-events-auto"
-                        >
-                          <ShoppingCart size={16} /> Thêm vào giỏ
-                        </button>
-                      </div>
-                    </div>
-                    <div className="p-3 md:p-4 flex flex-col flex-grow">
-                      <Link
-                        href={`/products/${product.slug}`}
-                        prefetch={false}
-                        className="font-medium text-sm md:text-base text-gray-800 hover:text-orange-600 line-clamp-2 min-h-[2.5rem] transition mb-2"
-                      >
-                        {product.name}
-                      </Link>
-                      <div className="mt-auto">
-                        <span className="text-orange-600 font-bold text-sm md:text-base">
-                          {product.price.toLocaleString()}đ
-                        </span>
-                        {product.originalPrice &&
-                          product.originalPrice > product.price && (
-                            <span className="text-xs text-gray-400 line-through ml-2">
-                              {product.originalPrice.toLocaleString()}đ
-                            </span>
-                          )}
-                      </div>
-                    </div>
-                  </div>
+              <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-8">
+                {/* ĐÃ SỬA: Thay thế toàn bộ code cứng bằng Component ProductCard */}
+                {paginatedProducts.map((product: any) => (
+                  <ProductCard key={product.id} product={product} />
                 ))}
               </div>
             )}

@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ShoppingCart } from "lucide-react";
 import { useCart } from "@/hooks/useCart";
-import { useSession } from "next-auth/react"; // 1. Import hook kiểm tra đăng nhập
+import { useSession } from "next-auth/react";
 
 export interface MongoProduct {
   _id: string;
@@ -15,6 +15,8 @@ export interface MongoProduct {
   originalPrice?: number;
   discountPercent?: number;
   imageUrl: string;
+  soldQuantity?: number;
+  variants?: { inStock: number }[];
 }
 
 interface ProductCardProps {
@@ -22,19 +24,29 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
-  // 2. Lấy danh sách items cũ và hàm addItem
   const { items, addItem } = useCart();
-  // 3. Lấy thông tin đăng nhập của khách hàng
   const { data: session } = useSession();
+
+  // Tính tổng hàng tồn kho ngầm để khóa nút nếu hết hàng
+  const totalStock = product.variants
+    ? product.variants.reduce(
+        (total, variant) => total + (variant.inStock || 0),
+        0,
+      )
+    : 0;
 
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
-    // LÕI BẢO MẬT: Kiểm tra xem đã đăng nhập chưa
     if (!session) {
       alert("Vui lòng đăng nhập hoặc đăng ký tài khoản để mua hàng nhé!");
-      return; // Dừng hàm ngay lập tức, không cho thêm vào giỏ
+      return;
+    }
+
+    if (totalStock <= 0) {
+      alert("Sản phẩm này hiện đang tạm hết hàng!");
+      return;
     }
 
     const newItem = {
@@ -46,10 +58,8 @@ export default function ProductCard({ product }: ProductCardProps) {
       quantity: 1,
     };
 
-    // 4A. Cập nhật giao diện mượt mà ngay lập tức (Zustand)
     addItem(newItem);
 
-    // 4B. Cấu trúc lại mảng items mới nhất để gửi lên Server
     const updatedItems = [...items];
     const existingIndex = updatedItems.findIndex((i) => i.id === product._id);
     if (existingIndex > -1) {
@@ -58,7 +68,6 @@ export default function ProductCard({ product }: ProductCardProps) {
       updatedItems.push(newItem);
     }
 
-    // 5. Ngầm gọi API lưu dữ liệu xuống MongoDB
     try {
       await fetch("/api/cart", {
         method: "POST",
@@ -72,17 +81,17 @@ export default function ProductCard({ product }: ProductCardProps) {
   };
 
   return (
-    <div className="min-w-[260px] max-w-[260px] snap-start group cursor-pointer relative flex flex-col">
+    <div className="w-full h-full group cursor-pointer relative flex flex-col bg-white rounded-xl shadow-sm border border-gray-100 hover:border-orange-200 transition-all duration-300 overflow-hidden">
       <Link
         href={`/products/${product.slug}`}
-        className="relative w-full h-[260px] overflow-hidden rounded-xl mb-4 bg-white shadow-sm block"
+        className="relative w-full aspect-square overflow-hidden bg-gray-50 block"
       >
         <Image
           src={product.imageUrl}
           alt={product.name}
           fill
           className="object-cover group-hover:scale-105 transition-transform duration-500"
-          sizes="260px"
+          sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
         />
 
         {product.discountPercent && product.discountPercent > 0 ? (
@@ -94,31 +103,47 @@ export default function ProductCard({ product }: ProductCardProps) {
         <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-4 pointer-events-none">
           <button
             onClick={handleAddToCart}
-            className="bg-white text-gray-900 px-6 py-2.5 rounded-full font-medium text-sm flex items-center gap-2 hover:bg-orange-500 hover:text-white transition-colors shadow-lg transform translate-y-4 group-hover:translate-y-0 duration-300 pointer-events-auto"
+            disabled={totalStock <= 0}
+            className={`${
+              totalStock > 0
+                ? "bg-white text-gray-900 hover:bg-orange-500 hover:text-white"
+                : "bg-gray-300 text-gray-500 cursor-not-allowed"
+            } px-6 py-2.5 rounded-full font-medium text-sm flex items-center gap-2 transition-colors shadow-lg transform translate-y-4 group-hover:translate-y-0 duration-300 pointer-events-auto`}
           >
-            <ShoppingCart size={18} /> Thêm vào giỏ
+            <ShoppingCart size={18} />{" "}
+            {totalStock > 0 ? "Thêm vào giỏ" : "Hết hàng"}
           </button>
         </div>
       </Link>
 
-      <Link href={`/products/${product.slug}`} className="block">
-        <h3 className="font-medium text-gray-800 group-hover:text-orange-600 transition-colors text-lg truncate">
-          {product.name}
-        </h3>
-      </Link>
+      <div className="p-4 flex flex-col flex-grow">
+        <Link href={`/products/${product.slug}`} className="block mb-2">
+          <h3 className="font-medium text-gray-800 group-hover:text-orange-600 transition-colors text-base line-clamp-2">
+            {product.name}
+          </h3>
+        </Link>
 
-      <div className="flex items-baseline gap-2 mt-1">
-        <p className="text-orange-600 font-bold text-lg">
-          {product.price
-            ? `${product.price.toLocaleString("vi-VN")}đ`
-            : "Đang cập nhật"}
-        </p>
+        {/* Chỉ hiển thị Đã bán */}
+        <div className="flex items-center text-xs text-gray-500 mb-2 mt-auto">
+          <span>Đã bán</span>
+          <span className="ml-1 font-medium text-gray-700">
+            {product.soldQuantity || 0}
+          </span>
+        </div>
 
-        {product.originalPrice && product.originalPrice > product.price && (
-          <p className="text-gray-400 line-through text-sm font-medium">
-            {product.originalPrice.toLocaleString("vi-VN")}đ
+        <div className="flex items-baseline gap-2 mt-1 pt-2 border-t border-gray-100">
+          <p className="text-orange-600 font-bold text-lg">
+            {product.price
+              ? `${product.price.toLocaleString("vi-VN")}đ`
+              : "Đang cập nhật"}
           </p>
-        )}
+
+          {product.originalPrice && product.originalPrice > product.price && (
+            <p className="text-gray-400 line-through text-xs font-medium">
+              {product.originalPrice.toLocaleString("vi-VN")}đ
+            </p>
+          )}
+        </div>
       </div>
     </div>
   );
