@@ -3,6 +3,8 @@ import mongoose, { Schema } from "mongoose";
 
 const OrderSchema = new Schema(
   {
+    // Bổ sung email để biết đơn hàng này thuộc về tài khoản nào
+    userEmail: { type: String, required: true },
     customerInfo: {
       fullName: { type: String, required: true },
       phone: { type: String, required: true },

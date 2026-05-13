@@ -1,7 +1,6 @@
 import React from "react";
 import Link from "next/link";
-// Đã xóa import Youtube, Instagram
-import { MapPin, Phone, Mail, MessageCircle } from "lucide-react";
+import { MapPin, Mail } from "lucide-react";
 
 const Footer: React.FC = () => {
   return (
@@ -94,11 +93,10 @@ const Footer: React.FC = () => {
           </div>
         </div>
 
-        {/* Phần dưới cùng: Icons mạng xã hội (Chỉ còn TikTok) và Link Maps */}
-        {/* Phần dưới cùng: Icons mạng xã hội (Thay TikTok bằng Google Maps) và Link Maps */}
+        {/* Phần dưới cùng: Icons mạng xã hội và Link Maps */}
         <div className="flex flex-col items-center justify-center border-t border-gray-200 pt-8 gap-4">
           <div className="flex gap-3">
-            {/* Nút Google Maps thay cho TikTok */}
+            {/* Nút Google Maps */}
             <a
               href="https://maps.app.goo.gl/hpq8f2uS25udFEB77"
               target="_blank"
@@ -118,27 +116,7 @@ const Footer: React.FC = () => {
         </div>
       </div>
 
-      {/* Nút Liên hệ trôi nổi */}
-      <div className="fixed bottom-6 right-6 flex flex-col gap-3 z-50">
-        <a
-          href="tel:0971141140"
-          className="w-12 h-12 rounded-full bg-[#4caf50] flex items-center justify-center text-white shadow-lg hover:scale-110 transition-transform"
-        >
-          <Phone size={24} fill="currentColor" />
-        </a>
-        <a
-          href="#"
-          className="w-12 h-12 rounded-full bg-[#0068ff] flex items-center justify-center text-white shadow-lg hover:scale-110 transition-transform font-bold text-xs"
-        >
-          Zalo
-        </a>
-        <a
-          href="#"
-          className="w-12 h-12 rounded-full bg-[#0084ff] flex items-center justify-center text-white shadow-lg hover:scale-110 transition-transform"
-        >
-          <MessageCircle size={24} fill="currentColor" />
-        </a>
-      </div>
+      {/* Đã xóa hoàn toàn khối Nút Liên hệ trôi nổi (Zalo, Phone, Message) */}
     </footer>
   );
 };

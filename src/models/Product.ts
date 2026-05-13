@@ -1,22 +1,5 @@
-import mongoose, { Schema, Document } from "mongoose";
-
-const AttributeSchema = new Schema(
-  {
-    key: { type: String, required: true },
-    value: { type: String, required: true },
-  },
-  { _id: false }
-);
-
-const VariantSchema = new Schema({
-  sku: { type: String },
-  color: { type: String },
-  size: { type: String },
-  price: { type: Number, required: true },
-  originalPrice: { type: Number },
-  inStock: { type: Number, default: 0 },
-  imageUrl: { type: String },
-});
+// src/models/Product.ts
+import mongoose, { Schema } from "mongoose";
 
 const ProductSchema = new Schema(
   {
@@ -26,18 +9,34 @@ const ProductSchema = new Schema(
     price: { type: Number, required: true },
     originalPrice: { type: Number },
     discountPercent: { type: Number },
-    tags: [{ type: String }],
+    soldQuantity: { type: Number, default: 0 }, // Trường quan trọng để cập nhật số lượng đã bán
     imageUrl: { type: String, required: true },
     gallery: [{ type: String }],
     category: { type: String, required: true },
     subCategory: { type: String },
     collectionName: { type: String },
-    attributes: [AttributeSchema],
-    variants: [VariantSchema],
+    attributes: [
+      {
+        key: { type: String },
+        value: { type: String },
+      },
+    ],
+    variants: [
+      {
+        sku: { type: String },
+        color: { type: String },
+        size: { type: String },
+        price: { type: Number },
+        inStock: { type: Number },
+        imageUrl: { type: String },
+      },
+    ],
     inStock: { type: Boolean, default: true },
     isActive: { type: Boolean, default: true },
   },
-  { timestamps: true, collection: "products" }
+  { timestamps: true, collection: "products" },
 );
 
-export default mongoose.models.Product || mongoose.model("Product", ProductSchema);
+// Kiểm tra nếu model đã tồn tại thì dùng lại, nếu chưa thì tạo mới
+export default mongoose.models.Product ||
+  mongoose.model("Product", ProductSchema);

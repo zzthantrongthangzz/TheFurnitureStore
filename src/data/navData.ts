@@ -6,7 +6,7 @@ export interface SubCategory {
 export interface MenuCategory {
   title: string;
   href: string;
-  items?: SubCategory[]; 
+  items?: SubCategory[];
 }
 
 export type MenuItem = MenuCategory;
@@ -18,20 +18,12 @@ export const productCategories: MenuCategory[] = [
     href: "/collections",
     items: [
       { name: "ASTRO", href: "/collections/astro" },
-      { name: "SIGNATURE", href: "/collections/signature" },
       { name: "SCARLET", href: "/collections/scarlet" },
-      { name: "SERENA", href: "/collections/serena" },
-      { name: "PLANK", href: "/collections/plank" },
-      { name: "KLINE", href: "/collections/kline" },
-      { name: "DALUMD", href: "/collections/dalumd" },
       { name: "HOBRO", href: "/collections/hobro" },
       { name: "VLINE", href: "/collections/vline" },
       { name: "VIENNA", href: "/collections/vienna" },
-      { name: "KOSTER", href: "/collections/koster" },
-      { name: "NARVIK", href: "/collections/narvik" },
       { name: "OSLO", href: "/collections/oslo" },
       { name: "MILAN", href: "/collections/milan" },
-      { name: "FYN", href: "/collections/fyn" },
     ],
   },
   {
@@ -72,14 +64,6 @@ export const productCategories: MenuCategory[] = [
       { name: "Ghế Văn Phòng", href: "/phong-lam-viec/ghe-van-phong" },
       { name: "Tủ & Kệ", href: "/phong-lam-viec/tu-ke" },
     ],
-  },
-  {
-    title: "Tủ Bếp",
-    href: "/tu-bep",
-  },
-  {
-    title: "Nệm",
-    href: "/nem",
   },
 ];
 

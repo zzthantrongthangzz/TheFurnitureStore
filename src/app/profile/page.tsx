@@ -3,6 +3,7 @@
 import React, { useEffect } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import Link from "next/link"; // Đã import thêm Link
 import {
   User,
   Mail,
@@ -61,21 +62,28 @@ export default function ProfilePage() {
               </div>
 
               <nav className="space-y-1">
-                <button className="w-full flex items-center justify-between px-4 py-3 bg-orange-50 text-orange-600 rounded-xl font-bold transition">
+                <Link
+                  href="/profile"
+                  className="w-full flex items-center justify-between px-4 py-3 bg-orange-50 text-orange-600 rounded-xl font-bold transition"
+                >
                   <div className="flex items-center space-x-3">
                     <User size={18} />
                     <span>Thông tin cá nhân</span>
                   </div>
                   <ChevronRight size={16} />
-                </button>
+                </Link>
 
-                <button className="w-full flex items-center justify-between px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl font-medium transition">
+                {/* Đã sửa button thành Link để trỏ về trang đơn hàng */}
+                <Link
+                  href="/profile/orders"
+                  className="w-full flex items-center justify-between px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl font-medium transition block"
+                >
                   <div className="flex items-center space-x-3">
                     <Package size={18} />
                     <span>Đơn hàng của tôi</span>
                   </div>
                   <ChevronRight size={16} />
-                </button>
+                </Link>
 
                 <button className="w-full flex items-center justify-between px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl font-medium transition">
                   <div className="flex items-center space-x-3">
