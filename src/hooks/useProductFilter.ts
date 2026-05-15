@@ -1,4 +1,5 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
+import { useSearchParams } from "next/navigation";
 import { Product } from "@/types/product";
 
 type Filters = {
@@ -9,13 +10,17 @@ type Filters = {
 };
 
 export const useProductFilter = (initialProducts: Product[]) => {
-  const [filters, setFilters] = useState<Filters>({
-    categories: [],
+  const searchParams = useSearchParams();
+  const categoryParam = searchParams.get("category");
+
+  // 1. Khởi tạo giá trị ban đầu từ URL
+  const [filters, setFilters] = useState<Filters>(() => ({
+    categories: categoryParam ? [categoryParam] : [],
     priceRanges: [],
     colors: [],
     sizes: [],
-  });
-  // State riêng cho thanh kéo giá Tùy chọn
+  }));
+
   const [customPrice, setCustomPrice] = useState<{
     min: number;
     max: number;
@@ -24,7 +29,29 @@ export const useProductFilter = (initialProducts: Product[]) => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const itemsPerPage = 20;
 
-  // Lấy ra mức giá lớn nhất từ kho hàng để làm điểm max cho thanh kéo
+  // 2. Dùng useRef để ghi nhớ xem URL trước đó là gì
+  const prevCategoryParam = useRef(categoryParam);
+
+  useEffect(() => {
+    // SỬA LỖI TẠI ĐÂY: Chỉ reset bộ lọc khi tham số trên URL *THỰC SỰ THAY ĐỔI*
+    // Việc này cho phép bạn tích vô số ô vuông (Astro + Scarlet + Vienna...) mà không bị mất ô cũ.
+    if (categoryParam !== prevCategoryParam.current) {
+      if (categoryParam) {
+        setFilters({
+          categories: [categoryParam],
+          priceRanges: [],
+          colors: [],
+          sizes: [],
+        });
+      } else {
+        setFilters({ categories: [], priceRanges: [], colors: [], sizes: [] });
+      }
+      setCustomPrice(null);
+      setCurrentPage(1);
+      prevCategoryParam.current = categoryParam;
+    }
+  }, [categoryParam]);
+
   const maxProductPrice = useMemo(() => {
     if (initialProducts.length === 0) return 10000000;
     return Math.max(...initialProducts.map((p) => p.price));
@@ -33,6 +60,7 @@ export const useProductFilter = (initialProducts: Product[]) => {
   const toggleFilter = (type: keyof Filters, value: string) => {
     setFilters((prev) => {
       const currentValues = prev[type];
+      // Nếu đã có thì bỏ tích, nếu chưa có thì thêm vào mảng (cho phép chọn NHIỀU)
       const newValues = currentValues.includes(value)
         ? currentValues.filter((v) => v !== value)
         : [...currentValues, value];
@@ -50,16 +78,20 @@ export const useProductFilter = (initialProducts: Product[]) => {
   const processedProducts = useMemo(() => {
     let result = [...initialProducts];
 
+    // Lọc theo mảng chứa NHIỀU Danh mục
     if (filters.categories.length > 0) {
+      const activeCats = filters.categories.map((c) => c.toLowerCase());
       result = result.filter(
         (p) =>
-          filters.categories.includes(p.category) ||
-          filters.categories.includes(p.subCategory),
+          activeCats.includes((p.category || "").toLowerCase()) ||
+          activeCats.includes((p.subCategory || "").toLowerCase()) ||
+          activeCats.includes((p.collectionName || "").toLowerCase()),
       );
     }
+
     if (filters.colors.length > 0) {
-      result = result.filter((p) =>
-        p.colors.some((c) => filters.colors.includes(c)),
+      result = result.filter(
+        (p) => p.colors && p.colors.some((c) => filters.colors.includes(c)),
       );
     }
     if (filters.sizes.length > 0) {
@@ -68,7 +100,6 @@ export const useProductFilter = (initialProducts: Product[]) => {
       );
     }
 
-    // Lọc Giá: Kết hợp cả checkbox và thanh kéo Tùy chọn
     if (filters.priceRanges.length > 0 || customPrice) {
       result = result.filter((p) => {
         let matchCheckbox = false;
@@ -95,7 +126,11 @@ export const useProductFilter = (initialProducts: Product[]) => {
     }
 
     if (sortBy === "price-asc") result.sort((a, b) => a.price - b.price);
-    if (sortBy === "price-desc") result.sort((a, b) => b.price - a.price);
+    else if (sortBy === "price-desc") result.sort((a, b) => b.price - a.price);
+    else if (sortBy === "discount-desc")
+      result.sort(
+        (a, b) => (b.discountPercent || 0) - (a.discountPercent || 0),
+      );
 
     return result;
   }, [initialProducts, filters, customPrice, sortBy]);

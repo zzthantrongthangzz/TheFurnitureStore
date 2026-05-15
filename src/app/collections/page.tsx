@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import Image from "next/image";
 import ProductCard from "@/components/ui/ProductCard";
 import { useProductFilter } from "@/hooks/useProductFilter";
@@ -14,26 +14,18 @@ import {
   Truck,
 } from "lucide-react";
 
-const SUB_COLLECTIONS = [
+// CHỈ CHỨA CÁC THUỘC TÍNH CỦA BỘ SƯU TẬP
+const COLLECTION_OPTIONS = [
   { label: "ASTRO", val: "astro" },
   { label: "VIENNA", val: "vienna" },
   { label: "SCARLET", val: "scarlet" },
   { label: "HOBRO", val: "hobro" },
   { label: "MILAN", val: "milan" },
   { label: "VLINE", val: "vline" },
+  { label: "OSLO", val: "oslo" },
 ];
 
-const FilterAccordion = ({
-  title,
-  isOpen,
-  onToggle,
-  children,
-}: {
-  title: string;
-  isOpen: boolean;
-  onToggle: () => void;
-  children: React.ReactNode;
-}) => (
+const FilterAccordion = ({ title, isOpen, onToggle, children }: any) => (
   <div className="border-b pb-4">
     <button
       onClick={onToggle}
@@ -46,68 +38,16 @@ const FilterAccordion = ({
       />
     </button>
     <div
-      className={`overflow-hidden transition-all duration-300 ease-in-out ${
-        isOpen ? "max-h-96 opacity-100 overflow-y-auto" : "max-h-0 opacity-0"
-      }`}
+      className={`overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? "max-h-[1000px] opacity-100 overflow-y-auto" : "max-h-0 opacity-0"}`}
     >
       {children}
     </div>
   </div>
 );
 
-export default function CollectionsPage() {
+function CollectionsContent() {
   const [productsFromDB, setProductsFromDB] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const abortController = new AbortController();
-
-    const fetchProducts = async () => {
-      setIsLoading(true);
-      try {
-        const response = await fetch(`/api/products?timestamp=${Date.now()}`, {
-          signal: abortController.signal,
-          cache: "no-store",
-        });
-
-        if (!response.ok) {
-          throw new Error("Lỗi khi tải dữ liệu từ server");
-        }
-
-        const data = await response.json();
-        const productsArray = Array.isArray(data)
-          ? data
-          : data.products || data.data || [];
-
-        if (!abortController.signal.aborted) {
-          const formattedData = productsArray.map((p: any) => {
-            const col = (p.collectionName || "").toLowerCase();
-            const sub = (p.subCategory || "").toLowerCase();
-            const collectionValue = col || sub;
-
-            return {
-              ...p,
-              id: p._id?.toString() || p.id || p.slug,
-              category: collectionValue
-                ? collectionValue
-                : (p.category || "").toLowerCase(),
-            };
-          });
-
-          setProductsFromDB(formattedData);
-        }
-      } catch (error: any) {
-        if (error.name === "AbortError") return;
-        console.error("Lỗi kết nối hoặc lỗi server:", error);
-        if (!abortController.signal.aborted) setProductsFromDB([]);
-      } finally {
-        if (!abortController.signal.aborted) setIsLoading(false);
-      }
-    };
-
-    fetchProducts();
-    return () => abortController.abort();
-  }, []);
 
   const {
     filters,
@@ -125,15 +65,60 @@ export default function CollectionsPage() {
     totalCount,
   } = useProductFilter(productsFromDB);
 
-  // Đã xóa trạng thái mở của color và size
+  useEffect(() => {
+    const abortController = new AbortController();
+    const fetchProducts = async () => {
+      setIsLoading(true);
+      try {
+        const response = await fetch(`/api/products?timestamp=${Date.now()}`, {
+          signal: abortController.signal,
+          cache: "no-store",
+        });
+        if (!response.ok) throw new Error("Lỗi tải dữ liệu");
+
+        const data = await response.json();
+        const productsArray = Array.isArray(data)
+          ? data
+          : data.products || data.data || [];
+
+        if (!abortController.signal.aborted) {
+          const validOptions = COLLECTION_OPTIONS.map((c) => c.val);
+
+          const collectionProducts = productsArray.filter((p: any) => {
+            const col = (p.collectionName || "").toLowerCase();
+            const sub = (p.subCategory || "").toLowerCase();
+            const cat = (p.category || "").toLowerCase();
+            return (
+              cat === "bo-suu-tap" ||
+              validOptions.includes(col) ||
+              validOptions.includes(sub)
+            );
+          });
+
+          const formattedData = collectionProducts.map((p: any) => ({
+            ...p,
+            id: p._id?.toString() || p.id || p.slug,
+            category: p.collectionName || p.subCategory || p.category,
+          }));
+
+          setProductsFromDB(formattedData);
+        }
+      } catch (error: any) {
+        if (error.name !== "AbortError") console.error(error);
+      } finally {
+        if (!abortController.signal.aborted) setIsLoading(false);
+      }
+    };
+    fetchProducts();
+    return () => abortController.abort();
+  }, []);
+
   const [openSections, setOpenSections] = useState({
     category: true,
     price: true,
   });
-
   const toggleSection = (key: "category" | "price") =>
     setOpenSections((prev) => ({ ...prev, [key]: !prev[key] }));
-
   const [showCustomPrice, setShowCustomPrice] = useState(false);
   const [tempMinPrice, setTempMinPrice] = useState(0);
   const [tempMaxPrice, setTempMaxPrice] = useState(100000000);
@@ -152,9 +137,7 @@ export default function CollectionsPage() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-white">
         <div className="w-12 h-12 border-4 border-orange-200 border-t-orange-500 rounded-full animate-spin mb-4"></div>
-        <p className="text-gray-500 font-medium">
-          Đang tải Bộ Sưu Tập 3T Home...
-        </p>
+        <p className="text-gray-500 font-medium">Đang tải Bộ Sưu Tập...</p>
       </div>
     );
   }
@@ -164,7 +147,7 @@ export default function CollectionsPage() {
       <div className="w-full relative aspect-[21/9] md:aspect-[1920/400] bg-gray-100 overflow-hidden">
         <Image
           src="/images/banner-products.jpg"
-          alt="Banner Bộ Sưu Tập"
+          alt="Banner"
           fill
           sizes="100vw"
           className="object-cover"
@@ -175,29 +158,25 @@ export default function CollectionsPage() {
 
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8 xl:py-12">
         <div className="mb-6 border-b border-gray-100 pb-4">
-          <h1 className="text-3xl md:text-4xl font-bold uppercase tracking-wider mb-4 text-gray-900">
+          <h1 className="text-3xl md:text-4xl font-bold uppercase mb-4 text-gray-900">
             Bộ Sưu Tập
           </h1>
           <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
             <span className="text-sm text-gray-500 font-medium">
-              Hiển thị {totalCount} kết quả từ hệ thống
+              Hiển thị {totalCount} kết quả
             </span>
-            <div className="flex items-center space-x-2 text-sm text-gray-500">
-              <span className="font-medium">Sắp xếp theo:</span>
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="border-b border-gray-300 py-1 pr-2 font-medium text-gray-800 outline-none focus:border-orange-500 bg-transparent cursor-pointer"
-              >
-                <option value="default">Sản phẩm nổi bật</option>
-                <option value="price-asc">Giá: Tăng dần</option>
-                <option value="price-desc">Giá: Giảm dần</option>
-              </select>
-            </div>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="border-b border-gray-300 py-1 pr-2 font-medium bg-transparent outline-none"
+            >
+              <option value="default">Sản phẩm nổi bật</option>
+              <option value="price-asc">Giá: Tăng dần</option>
+              <option value="price-desc">Giá: Giảm dần</option>
+            </select>
           </div>
         </div>
 
-        {/* Đã xóa điều kiện hiển thị tag color và size */}
         {(filters.categories.length > 0 ||
           filters.priceRanges.length > 0 ||
           customPrice) && (
@@ -206,19 +185,20 @@ export default function CollectionsPage() {
               <Filter size={16} /> <span>Đang lọc:</span>
               <button
                 onClick={clearAllFilters}
-                className="text-sm font-medium text-gray-400 hover:text-red-500 hover:underline ml-4 transition"
+                className="text-sm font-medium text-gray-400 hover:text-red-500 ml-4"
               >
-                Xóa tất cả bộ lọc
+                Xóa tất cả
               </button>
             </div>
             <div className="flex flex-wrap gap-2 pl-4">
               {filters.categories.map((val) => (
                 <span
                   key={val}
-                  className="flex items-center space-x-1 bg-gray-100 border border-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm"
+                  className="flex items-center space-x-1 bg-gray-100 border border-gray-200 px-3 py-1 rounded-full text-sm"
                 >
                   <span>
-                    {SUB_COLLECTIONS.find((c) => c.val === val)?.label || val}
+                    {COLLECTION_OPTIONS.find((c) => c.val === val)?.label ||
+                      val}
                   </span>
                   <button
                     onClick={() => toggleFilter("categories", val)}
@@ -233,20 +213,20 @@ export default function CollectionsPage() {
         )}
 
         <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
-          {/* Sidebar bộ lọc */}
           <aside className="w-full lg:w-[260px] shrink-0">
             <div className="sticky top-24 space-y-5">
+              {/* ĐÃ TRẢ VỀ FONT CHỮ CŨ CHUẨN: BỘ LỌC */}
               <h2 className="font-bold text-xl text-gray-900 border-b-2 border-gray-900 pb-2 mb-6">
                 BỘ LỌC
               </h2>
 
               <FilterAccordion
-                title="Dòng sản phẩm"
+                title="Bộ Sưu Tập"
                 isOpen={openSections.category}
                 onToggle={() => toggleSection("category")}
               >
                 <div className="space-y-3 text-sm text-gray-600">
-                  {SUB_COLLECTIONS.map((cat) => (
+                  {COLLECTION_OPTIONS.map((cat) => (
                     <label
                       key={cat.val}
                       className="flex items-center space-x-3 cursor-pointer group"
@@ -265,6 +245,7 @@ export default function CollectionsPage() {
                 </div>
               </FilterAccordion>
 
+              {/* Lọc theo giá */}
               <FilterAccordion
                 title="Khoảng giá"
                 isOpen={openSections.price}
@@ -292,7 +273,6 @@ export default function CollectionsPage() {
                       </span>
                     </label>
                   ))}
-
                   <div className="pt-4 border-t border-gray-100 mt-4">
                     <label className="flex items-center space-x-3 cursor-pointer group mb-4">
                       <input
@@ -350,8 +330,6 @@ export default function CollectionsPage() {
                   </div>
                 </div>
               </FilterAccordion>
-
-              {/* Đã xóa hoàn toàn FilterAccordion cho Màu sắc và Kích thước */}
             </div>
           </aside>
 
@@ -387,42 +365,15 @@ export default function CollectionsPage() {
             )}
           </section>
         </div>
-
-        <div className="mt-20 py-10 border-t border-gray-100 flex flex-col items-center">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 w-full max-w-4xl text-center">
-            <div className="flex flex-col items-center space-y-2 group">
-              <div className="p-4 bg-orange-50 rounded-full text-orange-600 group-hover:bg-orange-600 group-hover:text-white transition duration-300">
-                <Truck size={28} />
-              </div>
-              <p className="font-bold text-sm text-gray-800">
-                Giao Hàng Miễn Phí
-              </p>
-            </div>
-            <div className="flex flex-col items-center space-y-2 group">
-              <div className="p-4 bg-orange-50 rounded-full text-orange-600 group-hover:bg-orange-600 group-hover:text-white transition duration-300">
-                <RefreshCw size={28} />
-              </div>
-              <p className="font-bold text-sm text-gray-800">Đổi Trả Dễ Dàng</p>
-            </div>
-            <div className="flex flex-col items-center space-y-2 group">
-              <div className="p-4 bg-orange-50 rounded-full text-orange-600 group-hover:bg-orange-600 group-hover:text-white transition duration-300">
-                <ShieldCheck size={28} />
-              </div>
-              <p className="font-bold text-sm text-gray-800">Bảo Hành 5 Năm</p>
-            </div>
-            <div className="flex flex-col items-center space-y-2 group">
-              <div className="p-4 bg-orange-50 rounded-full text-orange-600 group-hover:bg-orange-600 group-hover:text-white transition duration-300">
-                <Headphones size={28} />
-              </div>
-              <p className="font-bold text-sm text-gray-800">Hỗ Trợ 24/7</p>
-            </div>
-          </div>
-          <p className="mt-10 text-center text-gray-500 text-sm max-w-2xl leading-relaxed">
-            Nội Thất 3T Home - Kiến tạo không gian sống hiện đại, bền vững và an
-            toàn cho gia đình Việt.
-          </p>
-        </div>
       </div>
     </main>
+  );
+}
+
+export default function CollectionsPage() {
+  return (
+    <Suspense fallback={<div>Đang tải...</div>}>
+      <CollectionsContent />
+    </Suspense>
   );
 }

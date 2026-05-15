@@ -17,75 +17,55 @@ export const productCategories: MenuCategory[] = [
     title: "Bộ Sưu Tập",
     href: "/collections",
     items: [
-      { name: "ASTRO", href: "/collections/astro" },
-      { name: "SCARLET", href: "/collections/scarlet" },
-      { name: "HOBRO", href: "/collections/hobro" },
-      { name: "VLINE", href: "/collections/vline" },
-      { name: "VIENNA", href: "/collections/vienna" },
-      { name: "OSLO", href: "/collections/oslo" },
-      { name: "MILAN", href: "/collections/milan" },
+      { name: "ASTRO", href: "/collections?category=astro" },
+      { name: "SCARLET", href: "/collections?category=scarlet" },
+      { name: "HOBRO", href: "/collections?category=hobro" },
+      { name: "VLINE", href: "/collections?category=vline" },
+      { name: "VIENNA", href: "/collections?category=vienna" },
+      { name: "OSLO", href: "/collections?category=oslo" },
+      { name: "MILAN", href: "/collections?category=milan" },
     ],
   },
   {
     title: "Phòng Ngủ",
     href: "/phong-ngu",
     items: [
-      { name: "Combo Phòng Ngủ", href: "/phong-ngu/combo" },
-      { name: "Tủ Quần Áo", href: "/phong-ngu/tu-quan-ao" },
-      { name: "Giường Ngủ", href: "/phong-ngu/giuong-ngu" },
-      { name: "Tủ Đầu Giường", href: "/phong-ngu/tu-dau-giuong" },
-      { name: "Bàn Trang Điểm", href: "/phong-ngu/ban-trang-diem" },
+      { name: "Combo Phòng Ngủ", href: "/phong-ngu?category=combo-phong-ngu" },
+      { name: "Tủ Quần Áo", href: "/phong-ngu?category=tu-quan-ao" },
+      { name: "Giường Ngủ", href: "/phong-ngu?category=giuong-ngu" },
+      { name: "Tủ Đầu Giường", href: "/phong-ngu?category=tu-dau-giuong" },
+      { name: "Bàn Trang Điểm", href: "/phong-ngu?category=ban-trang-diem" },
     ],
   },
   {
     title: "Phòng Khách",
     href: "/phong-khach",
     items: [
-      { name: "Ghế Sofa", href: "/phong-khach/ghe-sofa" },
-      { name: "Bàn Sofa - Bàn Cafe - Bàn Trà", href: "/phong-khach/ban-sofa" },
-      { name: "Tủ Kệ Tivi", href: "/phong-khach/tu-ke-tivi" },
-      { name: "Tủ Giày - Tủ Trang Trí", href: "/phong-khach/tu-giay" },
+      { name: "Ghế Sofa", href: "/phong-khach?category=ghe-sofa" },
+      {
+        name: "Bàn Sofa - Bàn Cafe - Bàn Trà",
+        href: "/phong-khach?category=ban-sofa",
+      },
+      { name: "Tủ Kệ Tivi", href: "/phong-khach?category=tu-ke-tivi" },
+      { name: "Tủ Giày - Tủ Trang Trí", href: "/phong-khach?category=tu-giay" },
     ],
   },
   {
     title: "Phòng Ăn",
     href: "/phong-an",
     items: [
-      { name: "Bàn Ăn", href: "/phong-an/ban-an" },
-      { name: "Ghế Ăn", href: "/phong-an/ghe-an" },
-      { name: "Bộ Bàn Ăn", href: "/phong-an/bo-ban-an" },
+      { name: "Bàn Ăn", href: "/phong-an?category=ban-an" },
+      { name: "Ghế Ăn", href: "/phong-an?category=ghe-an" },
+      { name: "Bộ Bàn Ăn", href: "/phong-an?category=bo-ban-an" },
     ],
   },
   {
     title: "Phòng Làm Việc",
     href: "/phong-lam-viec",
     items: [
-      { name: "Bàn Làm Việc", href: "/phong-lam-viec/ban-lam-viec" },
-      { name: "Ghế Văn Phòng", href: "/phong-lam-viec/ghe-van-phong" },
-      { name: "Tủ & Kệ", href: "/phong-lam-viec/tu-ke" },
+      { name: "Bàn Làm Việc", href: "/phong-lam-viec?category=ban-lam-viec" },
+      { name: "Ghế Văn Phòng", href: "/phong-lam-viec?category=ghe-van-phong" },
+      { name: "Tủ & Kệ", href: "/phong-lam-viec?category=tu-ke" },
     ],
   },
-];
-
-export const promotionCategories: MenuItem[] = [
-  { title: "Brand Day", href: "/promotions/brand-day" },
-  { title: "3T Outlet - Hàng Thanh Lý", href: "/promotions/outlet" },
-];
-
-export const newsCategories: MenuItem[] = [
-  { title: "Tips", href: "/news/tips" },
-  {
-    title: "Thi công - Thiết kế",
-    href: "/news/design",
-    items: [
-      { name: "Phòng Bếp", href: "/news/design/kitchen" },
-      { name: "Phòng Ngủ", href: "/news/design/bedroom" },
-    ],
-  },
-  { title: "Media", href: "/news/media" },
-  { title: "News", href: "/news/general" },
-  { title: "People", href: "/news/people" },
-  { title: "Inspiration", href: "/news/inspiration" },
-  { title: "Báo chí", href: "/news/press" },
-  { title: "Nệm", href: "/news/mattress" },
 ];

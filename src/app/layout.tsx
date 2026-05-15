@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Navbar from "@/components/ui/Navbar"; // Import Navbar
-import Footer from "@/components/ui/Footer"; // Import Footer
+import Navbar from "@/components/ui/Navbar";
+import Footer from "@/components/ui/Footer";
 import Breadcrumb from "@/components/ui/Breadcrumb";
 
-// 1. Import NextAuthProvider mà bạn vừa tạo
 import { NextAuthProvider } from "@/providers/NextAuthProvider";
 
 export const metadata: Metadata = {
@@ -18,9 +17,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="vi">
-      <body className="flex flex-col min-h-screen bg-gray-50">
-        {/* 2. Bọc toàn bộ ứng dụng bên trong NextAuthProvider */}
+    // Thêm suppressHydrationWarning vào html và body để chặn lỗi từ Grammarly/Extensions
+    <html lang="vi" suppressHydrationWarning>
+      <body
+        className="flex flex-col min-h-screen bg-gray-50"
+        suppressHydrationWarning
+      >
         <NextAuthProvider>
           <Navbar />
           {/* <Breadcrumb /> */}

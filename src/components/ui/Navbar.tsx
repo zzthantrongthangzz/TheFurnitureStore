@@ -14,22 +14,15 @@ import {
 import LoginForm from "./LoginForm";
 import RegisterForm from "./RegisterForm";
 
-import {
-  productCategories,
-  promotionCategories,
-  newsCategories,
-  MenuItem,
-  SubItem,
-} from "@/data/navData";
+import { productCategories, MenuItem, SubItem } from "@/data/navData";
 
-// Store giỏ hàng (Đã cập nhật để không dùng LocalStorage)
 import { useCart } from "@/hooks/useCart";
 
 const navItems = [
   { label: "Sản phẩm", href: "/products", hasDropdown: true },
   { label: "Thiết kế - Thi công", href: "/design" },
-  { label: "Khuyến mãi", href: "/promotions", hasDropdown: true },
-  { label: "Tin tức", href: "/news", hasDropdown: true },
+  { label: "Khuyến mãi", href: "/promotions" },
+  { label: "Tin tức", href: "/news" },
   { label: "Về 3T Home", href: "/about" },
   { label: "Cửa hàng", href: "/cua-hang" },
 ];
@@ -41,11 +34,9 @@ const Navbar = () => {
     "none",
   );
 
-  // --- LOGIC GIỎ HÀNG TỪ DATABASE ---
   const cartItems = useCart((state) => state.items);
   const setCartItems = useCart((state) => state.setItems);
 
-  // Kéo dữ liệu giỏ hàng từ DB khi user đăng nhập thành công
   useEffect(() => {
     const fetchCart = async () => {
       if (session?.user?.email) {
@@ -61,7 +52,6 @@ const Navbar = () => {
           console.error("Lỗi khi tải giỏ hàng:", error);
         }
       } else {
-        // Xóa giỏ hàng trên UI nếu khách chưa đăng nhập/đăng xuất
         setCartItems([]);
       }
     };
@@ -73,13 +63,11 @@ const Navbar = () => {
     (total, item) => total + item.quantity,
     0,
   );
-  // --------------------------------------
 
   return (
     <>
       <header className="bg-[#FDFBF7] border-b border-gray-200 font-sans text-gray-800 relative z-50">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-          {/* Logo */}
           <Link href="/" className="flex items-center">
             <img
               src="/logo3t.png"
@@ -88,7 +76,6 @@ const Navbar = () => {
             />
           </Link>
 
-          {/* Search Bar */}
           <div className="flex-grow max-w-xl px-8">
             <div className="flex items-stretch shadow-sm">
               <input
@@ -102,9 +89,7 @@ const Navbar = () => {
             </div>
           </div>
 
-          {/* User Actions & Cart */}
           <div className="flex items-center space-x-6 text-sm">
-            {/* THÊM NÚT ADMIN: Chỉ hiện khi đăng nhập và có role là admin */}
             {session?.user?.role === "admin" && (
               <Link
                 href="/admin/products/add"
@@ -114,7 +99,6 @@ const Navbar = () => {
               </Link>
             )}
             {session ? (
-              // NẾU ĐÃ ĐĂNG NHẬP: Hiển thị tên (Đã kéo dài độ rộng)
               <div className="relative group">
                 <Link
                   href="/profile"
@@ -125,7 +109,6 @@ const Navbar = () => {
                     size={20}
                   />
                   <div className="flex flex-col">
-                    {/* Đã tăng max-w-[250px] để tên hiển thị dài hơn */}
                     <span className="text-orange-600 font-bold line-clamp-1 max-w-[250px]">
                       Chào, {session.user?.name || "Khách hàng"}
                     </span>
@@ -141,7 +124,6 @@ const Navbar = () => {
                   </div>
                 </Link>
 
-                {/* Dropdown Menu */}
                 <div className="absolute top-full right-0 mt-4 w-48 bg-white shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 border border-gray-100 z-50 rounded-lg">
                   <ul className="flex flex-col py-2">
                     <li>
@@ -164,7 +146,6 @@ const Navbar = () => {
                 </div>
               </div>
             ) : (
-              // NẾU CHƯA ĐĂNG NHẬP
               <button
                 onClick={() => setActiveModal("login")}
                 className="flex items-center space-x-2 hover:text-orange-500 transition text-left group"
@@ -208,7 +189,6 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* Navigation Menu */}
         <div className="container mx-auto px-4 flex items-center justify-center space-x-8 text-lg border-t border-gray-100">
           {navItems.map((item) => {
             const isActive = pathname === item.href;
@@ -223,15 +203,7 @@ const Navbar = () => {
                       : "text-gray-700 hover:text-orange-500"
                   }`}
                 >
-                  <span
-                    className={
-                      item.label === "Khuyến mãi" && !isActive
-                        ? "text-gray-700 group-hover:text-red-600"
-                        : ""
-                    }
-                  >
-                    {item.label}
-                  </span>
+                  <span>{item.label}</span>
                   {item.hasDropdown && (
                     <ChevronDown
                       size={14}
@@ -242,52 +214,48 @@ const Navbar = () => {
                   )}
                 </Link>
 
-                {/* Mega Menu Dropdown */}
                 {item.hasDropdown && (
                   <div className="absolute top-full left-0 w-64 bg-white shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 ease-in-out border border-gray-100 z-50 rounded-b-lg">
                     <ul className="flex flex-col py-2">
-                      {(item.label === "Sản phẩm"
-                        ? productCategories
-                        : item.label === "Khuyến mãi"
-                          ? promotionCategories
-                          : item.label === "Tin tức"
-                            ? newsCategories
-                            : []
-                      ).map((cat: MenuItem, idx: number) => (
-                        <li key={idx} className="relative group/item">
-                          <Link
-                            href={cat.href}
-                            className="flex items-center justify-between px-6 py-3 text-gray-700 hover:text-orange-500 hover:bg-gray-50 transition"
-                          >
-                            <span className="font-medium text-sm">
-                              {cat.title}
-                            </span>
-                            {cat.items && (
-                              <ChevronRight
-                                size={14}
-                                className="text-gray-400"
-                              />
-                            )}
-                          </Link>
+                      {(item.label === "Sản phẩm" ? productCategories : []).map(
+                        (cat: MenuItem, idx: number) => (
+                          <li key={idx} className="relative group/item">
+                            <Link
+                              href={cat.href}
+                              className="flex items-center justify-between px-6 py-3 text-gray-700 hover:text-orange-500 hover:bg-gray-50 transition"
+                            >
+                              <span className="font-medium text-sm">
+                                {cat.title}
+                              </span>
+                              {cat.items && (
+                                <ChevronRight
+                                  size={14}
+                                  className="text-gray-400"
+                                />
+                              )}
+                            </Link>
 
-                          {cat.items && (
-                            <div className="absolute left-full top-0 w-56 bg-white shadow-xl opacity-0 invisible group-hover/item:opacity-100 group-hover/item:visible transition-all duration-300 border border-gray-100 rounded-lg">
-                              <ul className="flex flex-col py-2">
-                                {cat.items.map((sub: SubItem, sIdx: number) => (
-                                  <li key={sIdx}>
-                                    <Link
-                                      href={sub.href}
-                                      className="block px-6 py-2.5 text-gray-600 hover:text-orange-500 hover:bg-gray-50 text-sm"
-                                    >
-                                      {sub.name}
-                                    </Link>
-                                  </li>
-                                ))}
-                              </ul>
-                            </div>
-                          )}
-                        </li>
-                      ))}
+                            {cat.items && (
+                              <div className="absolute left-full top-0 w-56 bg-white shadow-xl opacity-0 invisible group-hover/item:opacity-100 group-hover/item:visible transition-all duration-300 border border-gray-100 rounded-lg">
+                                <ul className="flex flex-col py-2">
+                                  {cat.items.map(
+                                    (sub: SubItem, sIdx: number) => (
+                                      <li key={sIdx}>
+                                        <Link
+                                          href={sub.href}
+                                          className="block px-6 py-2.5 text-gray-600 hover:text-orange-500 hover:bg-gray-50 text-sm"
+                                        >
+                                          {sub.name}
+                                        </Link>
+                                      </li>
+                                    ),
+                                  )}
+                                </ul>
+                              </div>
+                            )}
+                          </li>
+                        ),
+                      )}
                     </ul>
                   </div>
                 )}
@@ -297,7 +265,6 @@ const Navbar = () => {
         </div>
       </header>
 
-      {/* Auth Modals */}
       <LoginForm
         isOpen={activeModal === "login"}
         onClose={() => setActiveModal("none")}
