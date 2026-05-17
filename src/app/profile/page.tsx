@@ -163,7 +163,7 @@ export default function ProfilePage() {
                       <Phone size={18} className="text-gray-400" />
                       <span className="font-medium text-gray-800">
                         {/* Hiển thị số điện thoại từ session */}
-                        {(session.user as any)?.phone || "Chưa cập nhật"}
+                        {session.user.phone || "Chưa cập nhật"}
                       </span>
                     </div>
                   </div>

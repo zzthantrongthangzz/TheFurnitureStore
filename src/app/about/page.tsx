@@ -42,9 +42,11 @@ export default function AboutPage() {
       {/* 1. Phần Giới Thiệu */}
       <section className="py-10 container mx-auto px-4">
         <div className="flex justify-center mb-10" data-aos="fade-down">
-          <img
+          <Image
             src="/images/about/gioithieu.png"
             alt="Giới thiệu 3T Home"
+            width={1400}
+            height={800}
             className="w-full h-auto rounded-2xl shadow-lg"
           />
         </div>
@@ -52,16 +54,20 @@ export default function AboutPage() {
         {/* 2. Giá trị cốt lõi (Xếp liên tiếp nhau - Dọc) */}
         <div className="flex flex-col gap-10">
           <div data-aos="fade-up">
-            <img
+            <Image
               src="/images/about/giatricotloi.png"
               alt="Giá trị cốt lõi 1"
+              width={1400}
+              height={800}
               className="w-full h-auto rounded-2xl shadow-lg"
             />
           </div>
           <div data-aos="fade-up" data-aos-delay="200">
-            <img
+            <Image
               src="/images/about/giatricotloi2.png"
               alt="Giá trị cốt lõi 2"
+              width={1400}
+              height={800}
               className="w-full h-auto rounded-2xl shadow-lg"
             />
           </div>
@@ -69,9 +75,11 @@ export default function AboutPage() {
 
         {/* 3. Chứng chỉ chứng nhận */}
         <div className="mt-20 flex justify-center" data-aos="zoom-in">
-          <img
+          <Image
             src="/images/about/chungnhan.png"
             alt="Chứng nhận"
+            width={1400}
+            height={800}
             className="w-full h-auto rounded-2xl shadow-lg"
           />
         </div>

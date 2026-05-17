@@ -1,7 +1,7 @@
 // src/app/phong-ngu/combo/page.tsx
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { mockProducts } from "@/data/mockProducts";
@@ -47,7 +47,7 @@ const FilterAccordion = ({
   </div>
 );
 
-export default function BedroomComboPage() {
+function BedroomComboPageContent() {
   // LỌC DỮ LIỆU CẤP 3: Lấy sản phẩm phòng ngủ có subCategory là "combo-phong-ngu"
   const comboProducts = mockProducts.filter(
     (p) => p.category === "phong-ngu" && p.subCategory === "combo-phong-ngu",
@@ -535,5 +535,19 @@ export default function BedroomComboPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function BedroomComboPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-white">
+          Đang tải dữ liệu...
+        </div>
+      }
+    >
+      <BedroomComboPageContent />
+    </Suspense>
   );
 }

@@ -1,11 +1,11 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import Image from "next/image";
 import ProductCard from "@/components/ui/ProductCard";
 import { useProductFilter } from "@/hooks/useProductFilter";
+import { Product } from "@/types/product";
 import {
-  ChevronRight,
   ChevronDown,
   RefreshCw,
   ShieldCheck,
@@ -56,8 +56,8 @@ const FilterAccordion = ({
   </div>
 );
 
-export default function BedroomPage() {
-  const [productsFromDB, setProductsFromDB] = useState<any[]>([]);
+function BedroomPageContent() {
+  const [productsFromDB, setProductsFromDB] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -81,7 +81,7 @@ export default function BedroomPage() {
         if (!abortController.signal.aborted) {
           const validSubCats = BEDROOM_CATEGORIES.map((c) => c.val);
 
-          const bedroomProducts = productsArray.filter((p: any) => {
+          const bedroomProducts = productsArray.filter((p: Product) => {
             const cat = (p.category || "").toLowerCase();
             const sub = (p.subCategory || "").toLowerCase();
             return (
@@ -91,7 +91,7 @@ export default function BedroomPage() {
             );
           });
 
-          const formattedData = bedroomProducts.map((p: any) => {
+          const formattedData = bedroomProducts.map((p: Product) => {
             const sub = (p.subCategory || "").toLowerCase();
             return {
               ...p,
@@ -102,8 +102,8 @@ export default function BedroomPage() {
 
           setProductsFromDB(formattedData);
         }
-      } catch (error: any) {
-        if (error.name === "AbortError") return;
+      } catch (error: unknown) {
+        if (error instanceof Error && error.name === "AbortError") return;
         console.error("Lỗi kết nối hoặc lỗi server:", error);
       } finally {
         if (!abortController.signal.aborted) setIsLoading(false);
@@ -408,7 +408,7 @@ export default function BedroomPage() {
               </div>
             ) : (
               <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
-                {paginatedProducts.map((product: any) => (
+                {paginatedProducts.map((product) => (
                   <ProductCard key={product.id} product={product} />
                 ))}
               </div>
@@ -484,5 +484,19 @@ export default function BedroomPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function BedroomPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-white">
+          Đang tải dữ liệu...
+        </div>
+      }
+    >
+      <BedroomPageContent />
+    </Suspense>
   );
 }

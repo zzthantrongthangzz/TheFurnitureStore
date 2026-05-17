@@ -4,15 +4,8 @@ import React, { useState, useEffect, Suspense } from "react";
 import Image from "next/image";
 import ProductCard from "@/components/ui/ProductCard";
 import { useProductFilter } from "@/hooks/useProductFilter";
-import {
-  ChevronDown,
-  X,
-  Filter,
-  RefreshCw,
-  ShieldCheck,
-  Headphones,
-  Truck,
-} from "lucide-react";
+import { Product } from "@/types/product";
+import { ChevronDown, X, Filter } from "lucide-react";
 
 // CHỈ CHỨA CÁC THUỘC TÍNH CỦA BỘ SƯU TẬP
 const COLLECTION_OPTIONS = [
@@ -25,7 +18,17 @@ const COLLECTION_OPTIONS = [
   { label: "OSLO", val: "oslo" },
 ];
 
-const FilterAccordion = ({ title, isOpen, onToggle, children }: any) => (
+const FilterAccordion = ({
+  title,
+  isOpen,
+  onToggle,
+  children,
+}: {
+  title: string;
+  isOpen: boolean;
+  onToggle: () => void;
+  children: React.ReactNode;
+}) => (
   <div className="border-b pb-4">
     <button
       onClick={onToggle}
@@ -46,7 +49,7 @@ const FilterAccordion = ({ title, isOpen, onToggle, children }: any) => (
 );
 
 function CollectionsContent() {
-  const [productsFromDB, setProductsFromDB] = useState<any[]>([]);
+  const [productsFromDB, setProductsFromDB] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const {
@@ -84,7 +87,7 @@ function CollectionsContent() {
         if (!abortController.signal.aborted) {
           const validOptions = COLLECTION_OPTIONS.map((c) => c.val);
 
-          const collectionProducts = productsArray.filter((p: any) => {
+          const collectionProducts = productsArray.filter((p: Product) => {
             const col = (p.collectionName || "").toLowerCase();
             const sub = (p.subCategory || "").toLowerCase();
             const cat = (p.category || "").toLowerCase();
@@ -95,7 +98,7 @@ function CollectionsContent() {
             );
           });
 
-          const formattedData = collectionProducts.map((p: any) => ({
+          const formattedData = collectionProducts.map((p: Product) => ({
             ...p,
             id: p._id?.toString() || p.id || p.slug,
             category: p.collectionName || p.subCategory || p.category,
@@ -103,8 +106,10 @@ function CollectionsContent() {
 
           setProductsFromDB(formattedData);
         }
-      } catch (error: any) {
-        if (error.name !== "AbortError") console.error(error);
+      } catch (error: unknown) {
+        if (!(error instanceof Error && error.name === "AbortError")) {
+          console.error(error);
+        }
       } finally {
         if (!abortController.signal.aborted) setIsLoading(false);
       }
@@ -340,7 +345,7 @@ function CollectionsContent() {
               </div>
             ) : (
               <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-8">
-                {paginatedProducts.map((product: any) => (
+                {paginatedProducts.map((product) => (
                   <ProductCard key={product.id} product={product} />
                 ))}
               </div>

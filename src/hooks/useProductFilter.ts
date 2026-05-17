@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useState, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import { Product } from "@/types/product";
 
@@ -30,27 +30,23 @@ export const useProductFilter = (initialProducts: Product[]) => {
   const itemsPerPage = 20;
 
   // 2. Dùng useRef để ghi nhớ xem URL trước đó là gì
-  const prevCategoryParam = useRef(categoryParam);
+  const [prevCategoryParam, setPrevCategoryParam] = useState(categoryParam);
 
-  useEffect(() => {
-    // SỬA LỖI TẠI ĐÂY: Chỉ reset bộ lọc khi tham số trên URL *THỰC SỰ THAY ĐỔI*
-    // Việc này cho phép bạn tích vô số ô vuông (Astro + Scarlet + Vienna...) mà không bị mất ô cũ.
-    if (categoryParam !== prevCategoryParam.current) {
-      if (categoryParam) {
-        setFilters({
-          categories: [categoryParam],
-          priceRanges: [],
-          colors: [],
-          sizes: [],
-        });
-      } else {
-        setFilters({ categories: [], priceRanges: [], colors: [], sizes: [] });
-      }
-      setCustomPrice(null);
-      setCurrentPage(1);
-      prevCategoryParam.current = categoryParam;
+  if (categoryParam !== prevCategoryParam) {
+    setPrevCategoryParam(categoryParam);
+    if (categoryParam) {
+      setFilters({
+        categories: [categoryParam],
+        priceRanges: [],
+        colors: [],
+        sizes: [],
+      });
+    } else {
+      setFilters({ categories: [], priceRanges: [], colors: [], sizes: [] });
     }
-  }, [categoryParam]);
+    setCustomPrice(null);
+    setCurrentPage(1);
+  }
 
   const maxProductPrice = useMemo(() => {
     if (initialProducts.length === 0) return 10000000;
@@ -60,7 +56,6 @@ export const useProductFilter = (initialProducts: Product[]) => {
   const toggleFilter = (type: keyof Filters, value: string) => {
     setFilters((prev) => {
       const currentValues = prev[type];
-      // Nếu đã có thì bỏ tích, nếu chưa có thì thêm vào mảng (cho phép chọn NHIỀU)
       const newValues = currentValues.includes(value)
         ? currentValues.filter((v) => v !== value)
         : [...currentValues, value];
@@ -85,7 +80,9 @@ export const useProductFilter = (initialProducts: Product[]) => {
         (p) =>
           activeCats.includes((p.category || "").toLowerCase()) ||
           activeCats.includes((p.subCategory || "").toLowerCase()) ||
-          activeCats.includes((p.collectionName || "").toLowerCase()),
+          activeCats.includes(
+            (p.collectionName || p.collection || "").toLowerCase(),
+          ),
       );
     }
 

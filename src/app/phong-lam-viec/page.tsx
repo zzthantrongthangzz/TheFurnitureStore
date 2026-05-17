@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import Image from "next/image";
 import ProductCard from "@/components/ui/ProductCard";
 import { useProductFilter } from "@/hooks/useProductFilter";
+import { Product } from "@/types/product";
 import {
   ChevronDown,
   RefreshCw,
@@ -53,8 +54,8 @@ const FilterAccordion = ({
   </div>
 );
 
-export default function WorkspacePage() {
-  const [productsFromDB, setProductsFromDB] = useState<any[]>([]);
+function WorkspacePageContent() {
+  const [productsFromDB, setProductsFromDB] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -78,7 +79,7 @@ export default function WorkspacePage() {
         if (!abortController.signal.aborted) {
           const validSubCats = WORKSPACE_CATEGORIES.map((c) => c.val);
 
-          const workspaceProducts = productsArray.filter((p: any) => {
+          const workspaceProducts = productsArray.filter((p: Product) => {
             const cat = (p.category || "").toLowerCase();
             const sub = (p.subCategory || "").toLowerCase();
             return (
@@ -88,7 +89,7 @@ export default function WorkspacePage() {
             );
           });
 
-          const formattedData = workspaceProducts.map((p: any) => {
+          const formattedData = workspaceProducts.map((p: Product) => {
             const sub = (p.subCategory || "").toLowerCase();
             return {
               ...p,
@@ -99,8 +100,8 @@ export default function WorkspacePage() {
 
           setProductsFromDB(formattedData);
         }
-      } catch (error: any) {
-        if (error.name === "AbortError") return;
+      } catch (error: unknown) {
+        if (error instanceof Error && error.name === "AbortError") return;
         console.error("Lỗi kết nối hoặc lỗi server:", error);
       } finally {
         if (!abortController.signal.aborted) setIsLoading(false);
@@ -405,7 +406,7 @@ export default function WorkspacePage() {
               </div>
             ) : (
               <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
-                {paginatedProducts.map((product: any) => (
+                {paginatedProducts.map((product) => (
                   <ProductCard key={product.id} product={product} />
                 ))}
               </div>
@@ -486,5 +487,19 @@ export default function WorkspacePage() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function WorkspacePage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-white">
+          Đang tải dữ liệu...
+        </div>
+      }
+    >
+      <WorkspacePageContent />
+    </Suspense>
   );
 }

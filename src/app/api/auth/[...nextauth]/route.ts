@@ -4,6 +4,10 @@ import bcrypt from "bcryptjs";
 import User from "@/models/User";
 import { connectToDatabase } from "@/lib/db";
 
+if (!process.env.NEXTAUTH_SECRET) {
+  throw new Error("NEXTAUTH_SECRET is required");
+}
+
 // Tách cấu hình ra thành biến authOptions và thêm từ khóa 'export'
 // Khai báo kiểu NextAuthOptions để TypeScript hỗ trợ tốt nhất
 export const authOptions: NextAuthOptions = {
@@ -15,15 +19,19 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
+        if (!credentials?.email || !credentials.password) {
+          throw new Error("Vui lòng nhập email và mật khẩu!");
+        }
+
         await connectToDatabase();
-        const user = await User.findOne({ email: credentials?.email }).select(
+        const user = await User.findOne({ email: credentials.email }).select(
           "+password",
         );
 
         if (!user) throw new Error("Email này chưa được đăng ký!");
 
         const isPasswordCorrect = await bcrypt.compare(
-          credentials!.password,
+          credentials.password,
           user.password,
         );
         if (!isPasswordCorrect) throw new Error("Mật khẩu không chính xác!");
@@ -41,23 +49,21 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        // Ép kiểu (as any) để lưu thêm các trường custom vào token
-        token.phone = (user as any).phone;
-        token.role = (user as any).role;
+        token.phone = user.phone;
+        token.role = user.role;
       }
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
-        // Ép kiểu (as any) để đưa các trường custom từ token ra session
-        (session.user as any).phone = token.phone;
-        (session.user as any).role = token.role;
+        session.user.phone = token.phone;
+        session.user.role = token.role;
       }
       return session;
     },
   },
   session: { strategy: "jwt" },
-  secret: process.env.NEXTAUTH_SECRET || "chuoi_bi_mat_cua_3t_home",
+  secret: process.env.NEXTAUTH_SECRET,
   pages: { signIn: "/" },
 };
 

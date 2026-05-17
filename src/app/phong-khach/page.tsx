@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import Image from "next/image";
 import ProductCard from "@/components/ui/ProductCard";
 import { useProductFilter } from "@/hooks/useProductFilter";
+import { Product } from "@/types/product";
 import {
   ChevronDown,
   RefreshCw,
@@ -54,8 +55,8 @@ const FilterAccordion = ({
   </div>
 );
 
-export default function LivingRoomPage() {
-  const [productsFromDB, setProductsFromDB] = useState<any[]>([]);
+function LivingRoomPageContent() {
+  const [productsFromDB, setProductsFromDB] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -79,7 +80,7 @@ export default function LivingRoomPage() {
         if (!abortController.signal.aborted) {
           const validSubCats = LIVING_ROOM_CATEGORIES.map((c) => c.val);
 
-          const livingRoomProducts = productsArray.filter((p: any) => {
+          const livingRoomProducts = productsArray.filter((p: Product) => {
             const cat = (p.category || "").toLowerCase();
             const sub = (p.subCategory || "").toLowerCase();
             return (
@@ -89,7 +90,7 @@ export default function LivingRoomPage() {
             );
           });
 
-          const formattedData = livingRoomProducts.map((p: any) => {
+          const formattedData = livingRoomProducts.map((p: Product) => {
             const sub = (p.subCategory || "").toLowerCase();
             return {
               ...p,
@@ -100,8 +101,8 @@ export default function LivingRoomPage() {
 
           setProductsFromDB(formattedData);
         }
-      } catch (error: any) {
-        if (error.name === "AbortError") return;
+      } catch (error: unknown) {
+        if (error instanceof Error && error.name === "AbortError") return;
         console.error("Lỗi fetch:", error);
       } finally {
         if (!abortController.signal.aborted) setIsLoading(false);
@@ -405,7 +406,7 @@ export default function LivingRoomPage() {
               </div>
             ) : (
               <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
-                {paginatedProducts.map((product: any) => (
+                {paginatedProducts.map((product) => (
                   <ProductCard key={product.id} product={product} />
                 ))}
               </div>
@@ -481,5 +482,19 @@ export default function LivingRoomPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function LivingRoomPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-white">
+          Đang tải dữ liệu...
+        </div>
+      }
+    >
+      <LivingRoomPageContent />
+    </Suspense>
   );
 }

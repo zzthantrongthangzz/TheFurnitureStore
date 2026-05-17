@@ -8,7 +8,8 @@ import { useCart } from "@/hooks/useCart";
 import { useSession } from "next-auth/react";
 
 export interface MongoProduct {
-  _id: string;
+  _id?: string;
+  id?: string;
   name: string;
   slug: string;
   price: number;
@@ -16,7 +17,8 @@ export interface MongoProduct {
   discountPercent?: number;
   imageUrl: string;
   soldQuantity?: number;
-  variants?: { inStock: number }[];
+  inStock?: boolean;
+  variants?: { inStock?: number }[];
 }
 
 interface ProductCardProps {
@@ -26,14 +28,17 @@ interface ProductCardProps {
 export default function ProductCard({ product }: ProductCardProps) {
   const { items, addItem } = useCart();
   const { data: session } = useSession();
+  const productId = product._id || product.id || product.slug;
 
   // Tính tổng hàng tồn kho ngầm để khóa nút nếu hết hàng
-  const totalStock = product.variants
+  const totalStock = product.variants?.length
     ? product.variants.reduce(
         (total, variant) => total + (variant.inStock || 0),
         0,
       )
-    : 0;
+    : product.inStock === false
+      ? 0
+      : 1;
 
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -50,7 +55,7 @@ export default function ProductCard({ product }: ProductCardProps) {
     }
 
     const newItem = {
-      id: product._id,
+      id: productId,
       name: product.name,
       price: product.price,
       imageUrl: product.imageUrl,
@@ -61,7 +66,7 @@ export default function ProductCard({ product }: ProductCardProps) {
     addItem(newItem);
 
     const updatedItems = [...items];
-    const existingIndex = updatedItems.findIndex((i) => i.id === product._id);
+    const existingIndex = updatedItems.findIndex((i) => i.id === productId);
     if (existingIndex > -1) {
       updatedItems[existingIndex].quantity += 1;
     } else {

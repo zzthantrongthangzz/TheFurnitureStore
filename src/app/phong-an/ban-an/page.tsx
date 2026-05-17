@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { mockProducts } from "@/data/mockProducts";
@@ -46,7 +46,7 @@ const FilterAccordion = ({
   </div>
 );
 
-export default function DiningTablePage() {
+function DiningTablePageContent() {
   // LỌC DỮ LIỆU CẤP 3: Bàn ăn
   const diningTableProducts = mockProducts.filter(
     (p) => p.category === "phong-an" && p.subCategory === "ban-an",
@@ -528,5 +528,19 @@ export default function DiningTablePage() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function DiningTablePage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-white">
+          Đang tải dữ liệu...
+        </div>
+      }
+    >
+      <DiningTablePageContent />
+    </Suspense>
   );
 }

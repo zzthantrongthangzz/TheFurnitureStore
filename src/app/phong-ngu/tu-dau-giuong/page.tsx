@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { mockProducts } from "@/data/mockProducts";
@@ -46,7 +46,7 @@ const FilterAccordion = ({
   </div>
 );
 
-export default function NightstandPage() {
+function NightstandPageContent() {
   // LỌC DỮ LIỆU CẤP 3: Tủ đầu giường
   const nightstandProducts = mockProducts.filter(
     (p) => p.category === "phong-ngu" && p.subCategory === "tu-dau-giuong",
@@ -528,5 +528,19 @@ export default function NightstandPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function NightstandPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-white">
+          Đang tải dữ liệu...
+        </div>
+      }
+    >
+      <NightstandPageContent />
+    </Suspense>
   );
 }

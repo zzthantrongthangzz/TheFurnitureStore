@@ -5,7 +5,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/route"; // IMPORT authOptions VÀO ĐÂY
 
 // API GET
-export async function GET(req: Request) {
+export async function GET() {
   try {
     // NHÉT authOptions VÀO TRONG NGOẶC (QUAN TRỌNG NHẤT)
     const session = await getServerSession(authOptions);
@@ -15,12 +15,12 @@ export async function GET(req: Request) {
     }
 
     await connectToDatabase();
-    let cart = await Cart.findOne({ userEmail: session.user.email });
+    const cart = await Cart.findOne({ userEmail: session.user.email });
 
     if (!cart) return NextResponse.json({ items: [] }, { status: 200 });
 
     return NextResponse.json(cart, { status: 200 });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ message: "Lỗi server" }, { status: 500 });
   }
 }
@@ -48,7 +48,7 @@ export async function POST(req: Request) {
     );
 
     return NextResponse.json(updatedCart, { status: 200 });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ message: "Lỗi lưu giỏ hàng" }, { status: 500 });
   }
 }

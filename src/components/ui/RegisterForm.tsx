@@ -73,7 +73,7 @@ export default function RegisterForm({
       } else {
         setErrorMsg(data.message || "Đăng ký thất bại, vui lòng kiểm tra lại.");
       }
-    } catch (error) {
+    } catch {
       setErrorMsg("Không thể kết nối đến máy chủ. Vui lòng thử lại sau.");
     } finally {
       setIsLoading(false);

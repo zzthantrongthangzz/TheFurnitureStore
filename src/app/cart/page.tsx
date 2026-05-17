@@ -1,13 +1,14 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Trash2, Plus, Minus, ArrowLeft } from "lucide-react";
 import { useCart } from "@/hooks/useCart";
+import { CartItem } from "@/types/cart";
 
 export default function CartPage() {
-  const [isMounted, setIsMounted] = useState(false);
   const router = useRouter();
 
   // Lấy thêm các state và hàm xử lý checkbox từ Zustand
@@ -20,11 +21,7 @@ export default function CartPage() {
     selectAllItems,
   } = useCart();
 
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  const syncCartToDB = async (updatedItems: any[]) => {
+  const syncCartToDB = async (updatedItems: CartItem[]) => {
     try {
       await fetch("/api/cart", {
         method: "POST",
@@ -59,14 +56,6 @@ export default function CartPage() {
     // Chuyển sang trang checkout
     router.push("/checkout");
   };
-
-  if (!isMounted) {
-    return (
-      <div className="container mx-auto p-8 text-center text-gray-500 font-medium">
-        Đang tải giỏ hàng...
-      </div>
-    );
-  }
 
   // CHỈ TÍNH TỔNG TIỀN CHO NHỮNG SẢN PHẨM ĐƯỢC TÍCH CHỌN
   const selectedItems = items.filter((item) => selectedIds.includes(item.id));
@@ -128,9 +117,12 @@ export default function CartPage() {
                       />
 
                       <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200 bg-gray-50">
-                        <img
+                        <Image
                           src={item.imageUrl}
                           alt={item.name}
+                          width={96}
+                          height={96}
+                          unoptimized
                           className="h-full w-full object-cover object-center"
                         />
                       </div>

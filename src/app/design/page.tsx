@@ -101,6 +101,7 @@ export default function DesignPage() {
             src="/images/design/background.jpg"
             alt="Interior Design Hero"
             fill
+            sizes="100vw"
             className="object-cover brightness-50"
             priority
           />
@@ -188,6 +189,7 @@ export default function DesignPage() {
                     src={image.src}
                     alt={image.alt}
                     fill
+                    sizes="100vw"
                     className="object-cover"
                     priority
                   />
@@ -221,6 +223,7 @@ export default function DesignPage() {
               src="/images/design/anhkeformtuvan.jpg"
               alt="Consultation"
               fill
+              sizes="(max-width: 1024px) 100vw, 50vw"
               className="object-cover"
             />
           </div>
@@ -275,6 +278,7 @@ export default function DesignPage() {
               src="/images/design/doinguthietke.jpg"
               alt="Design Team"
               fill
+              sizes="(max-width: 768px) 100vw, 50vw"
               className="object-cover"
             />
           </div>
@@ -301,6 +305,7 @@ export default function DesignPage() {
                   src={project.src}
                   alt={project.title}
                   fill
+                  sizes="(max-width: 768px) 100vw, 50vw"
                   className="object-cover transition-transform duration-700 group-hover:scale-110"
                 />
                 <div className="absolute inset-0 bg-black/10 group-hover:bg-black/30 transition-colors" />

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { mockProducts } from "@/data/mockProducts";
@@ -46,7 +46,7 @@ const FilterAccordion = ({
   </div>
 );
 
-export default function BedPage() {
+function BedPageContent() {
   // LỌC DỮ LIỆU CẤP 3: Giường ngủ
   const bedProducts = mockProducts.filter(
     (p) => p.category === "phong-ngu" && p.subCategory === "giuong-ngu",
@@ -528,5 +528,19 @@ export default function BedPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function BedPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-white">
+          Đang tải dữ liệu...
+        </div>
+      }
+    >
+      <BedPageContent />
+    </Suspense>
   );
 }

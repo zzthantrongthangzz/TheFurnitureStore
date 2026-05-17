@@ -2,6 +2,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import Image from "next/image";
 import {
   Eye,
   Search,
@@ -11,7 +12,6 @@ import {
   CheckCircle,
   Clock,
   AlertCircle,
-  Calendar,
   CreditCard,
 } from "lucide-react";
 
@@ -334,9 +334,12 @@ export default function OrdersManagementPage() {
                         key={idx}
                         className="flex gap-4 items-center bg-white p-3 rounded-lg border border-gray-100 shadow-sm"
                       >
-                        <img
+                        <Image
                           src={item.imageUrl}
                           alt={item.name}
+                          width={64}
+                          height={64}
+                          unoptimized
                           className="w-16 h-16 object-cover rounded-md border"
                         />
                         <div className="flex-1">
@@ -391,7 +394,7 @@ export default function OrdersManagementPage() {
                       <p className="flex justify-between">
                         <span className="text-gray-500">Ghi chú:</span>
                         <span className="font-medium text-orange-600 italic text-right max-w-xs">
-                          "{selectedOrder.customerInfo.note}"
+                          &ldquo;{selectedOrder.customerInfo.note}&rdquo;
                         </span>
                       </p>
                     )}

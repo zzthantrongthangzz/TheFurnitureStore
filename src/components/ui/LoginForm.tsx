@@ -47,7 +47,7 @@ export default function LoginForm({
         onClose();
         window.location.reload();
       }
-    } catch (err) {
+    } catch {
       setErrorMsg("Lỗi hệ thống, vui lòng thử lại!");
     } finally {
       setIsLoading(false);

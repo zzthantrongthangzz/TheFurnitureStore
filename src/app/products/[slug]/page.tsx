@@ -1,34 +1,67 @@
 "use client";
 
 // CẬP NHẬT: Nhớ import thêm hook `use` từ "react"
-import React, { useState, useEffect, use } from "react"; 
+import React, { useState, useEffect, use } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ShoppingCart, Minus, Plus, ChevronRight, ShieldCheck, Truck, RefreshCw, Headphones } from "lucide-react";
+import { useSession } from "next-auth/react";
+import {
+  ShoppingCart,
+  Minus,
+  Plus,
+  ChevronRight,
+  ShieldCheck,
+  Truck,
+  RefreshCw,
+  Headphones,
+} from "lucide-react";
 import { useCart } from "@/hooks/useCart";
 
+type ProductAttribute = {
+  key: string;
+  value: string;
+};
+
+type ProductDetail = {
+  id: string;
+  name: string;
+  price: number;
+  originalPrice: number;
+  slug: string;
+  images: string[];
+  material: string;
+  size: string;
+  color: string;
+  description: string;
+  inStock: boolean;
+};
+
 // CẬP NHẬT: Đổi kiểu params thành Promise
-export default function ProductDetailPage({ params }: { params: Promise<{ slug: string }> }) {
-  
+export default function ProductDetailPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
   // CẬP NHẬT: Sử dụng React.use() để unwrap params
   const resolvedParams = use(params);
   const slug = resolvedParams.slug;
 
-  const [product, setProduct] = useState<any>(null);
+  const [product, setProduct] = useState<ProductDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const [activeImage, setActiveImage] = useState("");
   const addItem = useCart((state) => state.addItem);
+  const { data: session } = useSession();
 
   useEffect(() => {
     const fetchProduct = async () => {
       try {
         setIsLoading(true);
-        
+
         // CẬP NHẬT: Thay params.slug thành biến slug đã unwrap ở trên
         const response = await fetch(`/api/products/${slug}`);
         if (!response.ok) throw new Error("Sản phẩm không tồn tại");
-        
+
         const data = await response.json();
 
         const allImages = [data.imageUrl];
@@ -37,8 +70,8 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
         }
 
         const getAttribute = (keyName: string) => {
-          const attr = data.attributes?.find((a: any) => 
-            a.key.toLowerCase().includes(keyName.toLowerCase())
+          const attr = data.attributes?.find((a: ProductAttribute) =>
+            a.key.toLowerCase().includes(keyName.toLowerCase()),
           );
           return attr ? attr.value : "Đang cập nhật";
         };
@@ -52,8 +85,19 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
           images: allImages,
           material: getAttribute("chất liệu"),
           size: getAttribute("kích thước"),
-          color: getAttribute("màu") || (data.variants && data.variants[0]?.color) || "Đang cập nhật",
-          description: data.description
+          color:
+            getAttribute("màu") ||
+            (data.variants && data.variants[0]?.color) ||
+            "Đang cập nhật",
+          description: data.description,
+          inStock:
+            data.inStock !== false &&
+            (!data.variants?.length ||
+              data.variants.reduce(
+                (total: number, variant: { inStock?: number }) =>
+                  total + (variant.inStock || 0),
+                0,
+              ) > 0),
         };
 
         setProduct(formattedProduct);
@@ -71,6 +115,14 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
 
   const handleAddToCart = () => {
     if (!product) return;
+    if (!session) {
+      alert("Vui lòng đăng nhập hoặc đăng ký tài khoản để mua hàng nhé!");
+      return;
+    }
+    if (!product.inStock) {
+      alert("Sản phẩm này hiện đang tạm hết hàng!");
+      return;
+    }
     addItem({
       id: product.id,
       name: product.name,
@@ -82,8 +134,9 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
     alert(`Đã thêm ${quantity} ${product.name} vào giỏ hàng!`);
   };
 
-  const increaseQuantity = () => setQuantity(prev => prev + 1);
-  const decreaseQuantity = () => setQuantity(prev => (prev > 1 ? prev - 1 : 1));
+  const increaseQuantity = () => setQuantity((prev) => prev + 1);
+  const decreaseQuantity = () =>
+    setQuantity((prev) => (prev > 1 ? prev - 1 : 1));
 
   if (isLoading) {
     return (
@@ -105,11 +158,17 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
     <main className="min-h-screen bg-white text-gray-800 pb-20">
       <div className="bg-gray-50 py-4 border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center text-sm text-gray-500 space-x-2">
-          <Link href="/" className="hover:text-orange-500 transition">Trang chủ</Link>
+          <Link href="/" className="hover:text-orange-500 transition">
+            Trang chủ
+          </Link>
           <ChevronRight size={14} />
-          <Link href="/products" className="hover:text-orange-500 transition">Sản phẩm</Link>
+          <Link href="/products" className="hover:text-orange-500 transition">
+            Sản phẩm
+          </Link>
           <ChevronRight size={14} />
-          <span className="text-gray-900 font-medium truncate">{product.name}</span>
+          <span className="text-gray-900 font-medium truncate">
+            {product.name}
+          </span>
         </div>
       </div>
 
@@ -122,21 +181,38 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
                   key={idx}
                   onClick={() => setActiveImage(img)}
                   className={`relative w-20 h-20 md:w-full md:aspect-square rounded-lg overflow-hidden border-2 transition-all ${
-                    activeImage === img ? "border-orange-500" : "border-transparent hover:border-orange-300"
+                    activeImage === img
+                      ? "border-orange-500"
+                      : "border-transparent hover:border-orange-300"
                   }`}
                 >
-                  <Image src={img} alt={`${product.name} ${idx}`} fill className="object-cover" />
+                  <Image
+                    src={img}
+                    alt={`${product.name} ${idx}`}
+                    fill
+                    sizes="(min-width: 768px) 96px, 80px"
+                    className="object-cover"
+                  />
                 </button>
               ))}
             </div>
             <div className="relative w-full aspect-square md:aspect-[4/5] bg-gray-100 rounded-2xl overflow-hidden flex-1">
-              <Image src={activeImage} alt={product.name} fill className="object-cover" priority />
+              <Image
+                src={activeImage}
+                alt={product.name}
+                fill
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                className="object-cover"
+                priority
+              />
             </div>
           </div>
 
           <div className="flex flex-col">
-            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">{product.name}</h1>
-            
+            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              {product.name}
+            </h1>
+
             <div className="flex items-end gap-4 mb-6 pb-6 border-b border-gray-100">
               <span className="text-3xl font-bold text-orange-600">
                 {product.price.toLocaleString("vi-VN")}đ
@@ -150,11 +226,15 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
 
             <div className="space-y-4 mb-8">
               <div className="flex items-start gap-4">
-                <span className="w-24 text-gray-500 font-medium">Chất liệu:</span>
+                <span className="w-24 text-gray-500 font-medium">
+                  Chất liệu:
+                </span>
                 <span className="flex-1 text-gray-900">{product.material}</span>
               </div>
               <div className="flex items-start gap-4">
-                <span className="w-24 text-gray-500 font-medium">Kích thước:</span>
+                <span className="w-24 text-gray-500 font-medium">
+                  Kích thước:
+                </span>
                 <span className="flex-1 text-gray-900">{product.size}</span>
               </div>
               <div className="flex items-start gap-4">
@@ -171,7 +251,9 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
                 >
                   <Minus size={18} />
                 </button>
-                <span className="w-12 text-center font-medium text-lg">{quantity}</span>
+                <span className="w-12 text-center font-medium text-lg">
+                  {quantity}
+                </span>
                 <button
                   onClick={increaseQuantity}
                   className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white hover:shadow-sm transition"
@@ -210,11 +292,12 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
         </div>
 
         <div className="mt-16 pt-10 border-t border-gray-200">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6 uppercase tracking-wide">Mô tả sản phẩm</h2>
-          <div 
-            className="prose max-w-none text-gray-600 leading-relaxed"
-            dangerouslySetInnerHTML={{ __html: product.description }}
-          />
+          <h2 className="text-2xl font-bold text-gray-900 mb-6 uppercase tracking-wide">
+            Mô tả sản phẩm
+          </h2>
+          <div className="prose max-w-none text-gray-600 leading-relaxed whitespace-pre-line">
+            {product.description}
+          </div>
         </div>
       </div>
     </main>

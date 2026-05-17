@@ -40,9 +40,31 @@ const getStatusColor = (status: string) => {
   }
 };
 
+type OrderItem = {
+  id: string;
+  name: string;
+  price: number;
+  quantity: number;
+  imageUrl: string;
+  slug?: string;
+};
+
+type Order = {
+  _id: string;
+  createdAt: string;
+  status: string;
+  totalAmount: number;
+  customerInfo: {
+    fullName: string;
+    phone: string;
+    address: string;
+  };
+  items: OrderItem[];
+};
+
 export default function MyOrdersPage() {
   const { data: session } = useSession();
-  const [orders, setOrders] = useState([]);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -77,8 +99,8 @@ export default function MyOrdersPage() {
       if (res.ok) {
         alert("Hủy đơn hàng thành công!");
         // Cập nhật lại UI ngay lập tức
-        setOrders((prevOrders: any) =>
-          prevOrders.map((o: any) =>
+        setOrders((prevOrders) =>
+          prevOrders.map((o) =>
             o._id === orderId ? { ...o, status: "CANCELLED" } : o,
           ),
         );
@@ -118,7 +140,7 @@ export default function MyOrdersPage() {
           </div>
         ) : (
           <div className="space-y-6">
-            {orders.map((order: any) => (
+            {orders.map((order) => (
               <div
                 key={order._id}
                 className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden"
@@ -147,7 +169,7 @@ export default function MyOrdersPage() {
                 </div>
 
                 <div className="p-5 divide-y divide-gray-100">
-                  {order.items.map((item: any) => (
+                  {order.items.map((item) => (
                     <div
                       key={item.id}
                       className="flex gap-4 py-4 first:pt-0 last:pb-0"
@@ -157,6 +179,7 @@ export default function MyOrdersPage() {
                           src={item.imageUrl}
                           alt={item.name}
                           fill
+                          sizes="80px"
                           className="object-cover"
                         />
                       </div>

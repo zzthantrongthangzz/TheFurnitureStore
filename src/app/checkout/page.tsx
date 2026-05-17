@@ -2,6 +2,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/hooks/useCart";
@@ -10,7 +11,8 @@ import { ChevronLeft, CheckCircle2, AlertCircle } from "lucide-react";
 export default function CheckoutPage() {
   const router = useRouter();
   const [isMounted, setIsMounted] = useState(false);
-  const { items, clearCart } = useCart();
+  const { items, selectedIds, clearCart, clearSelectedItems, setItems } =
+    useCart();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // State lưu trữ thông tin form
@@ -34,7 +36,12 @@ export default function CheckoutPage() {
     setIsMounted(true);
   }, []);
 
-  const cartTotal = items.reduce(
+  const checkoutItems =
+    selectedIds.length > 0
+      ? items.filter((item) => selectedIds.includes(item.id))
+      : items;
+
+  const cartTotal = checkoutItems.reduce(
     (total, item) => total + item.price * item.quantity,
     0,
   );
@@ -64,7 +71,10 @@ export default function CheckoutPage() {
           error = "Vui lòng không để trống địa chỉ.";
         } else {
           const firstChar = trimmedAddress.charAt(0);
-          if (firstChar !== firstChar.toUpperCase() || !/[A-ZÀ-Ỹ]/.test(firstChar)) {
+          if (
+            firstChar !== firstChar.toUpperCase() ||
+            !/[A-ZÀ-Ỹ]/.test(firstChar)
+          ) {
             error = "Địa chỉ phải bắt đầu bằng chữ cái in hoa.";
           } else if (trimmedAddress.length < 10) {
             error = "Vui lòng nhập địa chỉ chi tiết hơn (ít nhất 10 ký tự).";
@@ -104,7 +114,7 @@ export default function CheckoutPage() {
       address: validateField("address", formData.address),
     };
     setErrors(newErrors);
-    
+
     // Form hợp lệ nếu không có bất kỳ thông báo lỗi nào
     return !Object.values(newErrors).some((err) => err !== "");
   };
@@ -129,9 +139,10 @@ export default function CheckoutPage() {
           address: formData.address,
           note: formData.note,
         },
-        items: items.map(item => ({
+        items: checkoutItems.map((item) => ({
           id: item.id,
           productId: item.id,
+          slug: item.slug,
           name: item.name,
           price: item.price,
           quantity: item.quantity,
@@ -154,13 +165,32 @@ export default function CheckoutPage() {
         throw new Error("Có lỗi xảy ra khi tạo đơn hàng. Vui lòng thử lại!");
       }
 
-      // Nếu thành công: Xóa giỏ hàng và chuyển hướng
-      clearCart();
-      router.push("/checkout/success"); 
+      const remainingItems =
+        selectedIds.length > 0
+          ? items.filter((item) => !selectedIds.includes(item.id))
+          : [];
 
-    } catch (error: any) {
+      if (remainingItems.length > 0) {
+        setItems(remainingItems);
+        clearSelectedItems();
+        await fetch("/api/cart", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ items: remainingItems }),
+        });
+      } else {
+        clearCart();
+        await fetch("/api/cart", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ items: [] }),
+        });
+      }
+
+      router.push("/checkout/success");
+    } catch (error: unknown) {
       console.error("Lỗi đặt hàng:", error);
-      setSubmitError(error.message || "Lỗi hệ thống");
+      setSubmitError(error instanceof Error ? error.message : "Lỗi hệ thống");
     } finally {
       setIsSubmitting(false);
     }
@@ -168,7 +198,7 @@ export default function CheckoutPage() {
 
   if (!isMounted) return null;
 
-  if (items.length === 0) {
+  if (checkoutItems.length === 0) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 py-12">
         <div className="bg-white p-8 rounded-2xl shadow-sm text-center max-w-md w-full mx-4">
@@ -217,7 +247,11 @@ export default function CheckoutPage() {
                 Thông tin nhận hàng
               </h2>
 
-              <form id="checkout-form" onSubmit={handleSubmit} className="space-y-6">
+              <form
+                id="checkout-form"
+                onSubmit={handleSubmit}
+                className="space-y-6"
+              >
                 {/* Họ và tên */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -231,10 +265,16 @@ export default function CheckoutPage() {
                     onBlur={handleBlur}
                     placeholder="Nhập họ và tên của bạn"
                     className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-orange-500/20 focus:outline-none transition-colors ${
-                      errors.fullName ? "border-red-500 focus:border-red-500" : "border-gray-300 focus:border-orange-500"
+                      errors.fullName
+                        ? "border-red-500 focus:border-red-500"
+                        : "border-gray-300 focus:border-orange-500"
                     }`}
                   />
-                  {errors.fullName && <p className="text-red-500 text-sm mt-1.5">{errors.fullName}</p>}
+                  {errors.fullName && (
+                    <p className="text-red-500 text-sm mt-1.5">
+                      {errors.fullName}
+                    </p>
+                  )}
                 </div>
 
                 {/* Số điện thoại */}
@@ -250,10 +290,16 @@ export default function CheckoutPage() {
                     onBlur={handleBlur}
                     placeholder="Ví dụ: 0987654321"
                     className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-orange-500/20 focus:outline-none transition-colors ${
-                      errors.phone ? "border-red-500 focus:border-red-500" : "border-gray-300 focus:border-orange-500"
+                      errors.phone
+                        ? "border-red-500 focus:border-red-500"
+                        : "border-gray-300 focus:border-orange-500"
                     }`}
                   />
-                  {errors.phone && <p className="text-red-500 text-sm mt-1.5">{errors.phone}</p>}
+                  {errors.phone && (
+                    <p className="text-red-500 text-sm mt-1.5">
+                      {errors.phone}
+                    </p>
+                  )}
                 </div>
 
                 {/* Địa chỉ */}
@@ -269,10 +315,16 @@ export default function CheckoutPage() {
                     onBlur={handleBlur}
                     placeholder="Số nhà, Tên đường, Phường/Xã, Quận/Huyện, Tỉnh/Thành phố"
                     className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-orange-500/20 focus:outline-none transition-colors ${
-                      errors.address ? "border-red-500 focus:border-red-500" : "border-gray-300 focus:border-orange-500"
+                      errors.address
+                        ? "border-red-500 focus:border-red-500"
+                        : "border-gray-300 focus:border-orange-500"
                     }`}
                   />
-                  {errors.address && <p className="text-red-500 text-sm mt-1.5">{errors.address}</p>}
+                  {errors.address && (
+                    <p className="text-red-500 text-sm mt-1.5">
+                      {errors.address}
+                    </p>
+                  )}
                 </div>
 
                 {/* Ghi chú */}
@@ -297,11 +349,13 @@ export default function CheckoutPage() {
                   </h3>
                   <div className="space-y-3">
                     {/* 1. Thanh toán COD */}
-                    <label className={`flex items-center p-4 border rounded-xl cursor-pointer transition-all duration-200 ${
-                      formData.paymentMethod === "COD" 
-                        ? "border-orange-500 bg-orange-50/30" 
-                        : "border-gray-200 hover:bg-gray-50"
-                    }`}>
+                    <label
+                      className={`flex items-center p-4 border rounded-xl cursor-pointer transition-all duration-200 ${
+                        formData.paymentMethod === "COD"
+                          ? "border-orange-500 bg-orange-50/30"
+                          : "border-gray-200 hover:bg-gray-50"
+                      }`}
+                    >
                       <input
                         type="radio"
                         name="paymentMethod"
@@ -316,11 +370,13 @@ export default function CheckoutPage() {
                     </label>
 
                     {/* 2. Chuyển khoản ngân hàng */}
-                    <label className={`flex items-center p-4 border rounded-xl cursor-pointer transition-all duration-200 ${
-                      formData.paymentMethod === "BANK_TRANSFER" 
-                        ? "border-orange-500 bg-orange-50/30" 
-                        : "border-gray-200 hover:bg-gray-50"
-                    }`}>
+                    <label
+                      className={`flex items-center p-4 border rounded-xl cursor-pointer transition-all duration-200 ${
+                        formData.paymentMethod === "BANK_TRANSFER"
+                          ? "border-orange-500 bg-orange-50/30"
+                          : "border-gray-200 hover:bg-gray-50"
+                      }`}
+                    >
                       <input
                         type="radio"
                         name="paymentMethod"
@@ -347,21 +403,28 @@ export default function CheckoutPage() {
                           </p>
                           <p className="flex justify-between border-b border-blue-200/50 pb-2">
                             <span>Số tài khoản:</span>
-                            <span className="font-bold tracking-wider">0123 456 789</span>
+                            <span className="font-bold tracking-wider">
+                              0123 456 789
+                            </span>
                           </p>
                           <p className="flex justify-between border-b border-blue-200/50 pb-2">
                             <span>Chủ tài khoản:</span>
-                            <span className="font-bold uppercase">CONG TY NOI THAT 3T HOME</span>
+                            <span className="font-bold uppercase">
+                              CONG TY NOI THAT 3T HOME
+                            </span>
                           </p>
                           <p className="flex justify-between pt-1">
                             <span>Nội dung CK:</span>
                             <span className="font-bold text-orange-600">
-                              Thanh toan don hang - {formData.phone || "[Số điện thoại]"}
+                              Thanh toan don hang -{" "}
+                              {formData.phone || "[Số điện thoại]"}
                             </span>
                           </p>
                         </div>
                         <p className="text-xs text-blue-600 italic mt-4 text-center">
-                          * Vui lòng chuyển khoản đúng số tiền và nội dung. Đơn hàng sẽ được xử lý ngay sau khi chúng tôi nhận được thanh toán.
+                          * Vui lòng chuyển khoản đúng số tiền và nội dung. Đơn
+                          hàng sẽ được xử lý ngay sau khi chúng tôi nhận được
+                          thanh toán.
                         </p>
                       </div>
                     )}
@@ -375,16 +438,19 @@ export default function CheckoutPage() {
           <div className="w-full lg:w-2/5">
             <div className="bg-white p-6 lg:p-8 rounded-2xl shadow-sm border border-gray-100 sticky top-24">
               <h2 className="text-xl font-bold text-gray-900 mb-6 pb-4 border-b border-gray-100">
-                Tóm tắt đơn hàng ({items.length} sản phẩm)
+                Tóm tắt đơn hàng ({checkoutItems.length} sản phẩm)
               </h2>
 
               <div className="space-y-4 mb-6 max-h-[40vh] overflow-y-auto pr-2 custom-scrollbar">
-                {items.map((item) => (
+                {checkoutItems.map((item) => (
                   <div key={item.id} className="flex gap-4">
                     <div className="w-20 h-20 bg-gray-50 rounded-lg overflow-hidden shrink-0 border border-gray-100">
-                      <img
+                      <Image
                         src={item.imageUrl}
                         alt={item.name}
+                        width={80}
+                        height={80}
+                        unoptimized
                         className="w-full h-full object-cover"
                       />
                     </div>
@@ -397,7 +463,8 @@ export default function CheckoutPage() {
                           SL: {item.quantity}
                         </span>
                         <span className="text-sm font-bold text-orange-600">
-                          {(item.price * item.quantity).toLocaleString("vi-VN")}đ
+                          {(item.price * item.quantity).toLocaleString("vi-VN")}
+                          đ
                         </span>
                       </div>
                     </div>
@@ -444,8 +511,19 @@ export default function CheckoutPage() {
                       fill="none"
                       viewBox="0 0 24 24"
                     >
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
                     </svg>
                     Đang xử lý...
                   </span>
@@ -453,9 +531,10 @@ export default function CheckoutPage() {
                   "ĐẶT HÀNG NGAY"
                 )}
               </button>
-              
+
               <p className="text-center text-xs text-gray-500 mt-4">
-                Nhấn Đặt hàng đồng nghĩa với việc bạn đồng ý với Điều khoản của 3T Home.
+                Nhấn Đặt hàng đồng nghĩa với việc bạn đồng ý với Điều khoản của
+                3T Home.
               </p>
             </div>
           </div>

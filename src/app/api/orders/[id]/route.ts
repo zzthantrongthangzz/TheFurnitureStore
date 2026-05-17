@@ -11,6 +11,19 @@ const connectDB = async () => {
   await mongoose.connect(process.env.MONGODB_URI as string);
 };
 
+const ORDER_STATUSES = [
+  "PENDING",
+  "PROCESSING",
+  "SHIPPED",
+  "DELIVERED",
+  "CANCELLED",
+] as const;
+
+type OrderStatus = (typeof ORDER_STATUSES)[number];
+
+const isOrderStatus = (status: unknown): status is OrderStatus =>
+  typeof status === "string" && ORDER_STATUSES.includes(status as OrderStatus);
+
 // ==========================================
 // HÀM PUT: Dùng để Admin cập nhật trạng thái đơn hàng
 // ==========================================
@@ -20,12 +33,26 @@ export async function PUT(
 ) {
   try {
     await connectDB();
+    const session = await getServerSession(authOptions);
+    if (session?.user?.role !== "admin") {
+      return NextResponse.json(
+        { message: "Bạn không có quyền cập nhật đơn hàng" },
+        { status: 403 },
+      );
+    }
 
     const resolvedParams = await context.params;
     const orderId = resolvedParams.id;
 
     const body = await req.json();
     const { status } = body;
+
+    if (!isOrderStatus(status)) {
+      return NextResponse.json(
+        { message: "Trạng thái đơn hàng không hợp lệ" },
+        { status: 400 },
+      );
+    }
 
     const updatedOrder = await Order.findByIdAndUpdate(
       orderId,
@@ -86,10 +113,9 @@ export async function PATCH(
     }
 
     // 3. Xác thực quyền chủ sở hữu đơn hàng (Chỉ người đặt hoặc admin mới được hủy)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     if (
       order.userEmail !== session.user.email &&
-      (session.user as any).role !== "admin"
+      session.user.role !== "admin"
     ) {
       return NextResponse.json(
         { message: "Không có quyền thao tác" },

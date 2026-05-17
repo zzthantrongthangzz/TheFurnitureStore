@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { mockProducts } from "@/data/mockProducts";
@@ -46,7 +46,7 @@ const FilterAccordion = ({
   </div>
 );
 
-export default function WardrobePage() {
+function WardrobePageContent() {
   // LỌC DỮ LIỆU CẤP 3: Tủ quần áo
   const wardrobeProducts = mockProducts.filter(
     (p) => p.category === "phong-ngu" && p.subCategory === "tu-quan-ao",
@@ -530,5 +530,19 @@ export default function WardrobePage() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function WardrobePage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-white">
+          Đang tải dữ liệu...
+        </div>
+      }
+    >
+      <WardrobePageContent />
+    </Suspense>
   );
 }

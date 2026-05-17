@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
@@ -69,10 +70,13 @@ const Navbar = () => {
       <header className="bg-[#FDFBF7] border-b border-gray-200 font-sans text-gray-800 relative z-50">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
           <Link href="/" className="flex items-center">
-            <img
+            <Image
               src="/logo3t.png"
               alt="3T Home Logo"
-              className="h-20 w-auto object-contain"
+              width={160}
+              height={80}
+              className="object-contain"
+              priority
             />
           </Link>
 

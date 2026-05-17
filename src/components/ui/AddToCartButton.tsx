@@ -1,9 +1,9 @@
 "use client";
 
 import { useCart } from "@/hooks/useCart";
+import { Product } from "@/types/product";
 
-// Thay "any" bằng type Product thực tế của bạn sau này
-export default function AddToCartButton({ product }: { product: any }) {
+export default function AddToCartButton({ product }: { product: Product }) {
   const addItem = useCart((state) => state.addItem);
 
   const handleAddToCart = () => {
@@ -11,7 +11,7 @@ export default function AddToCartButton({ product }: { product: any }) {
       id: product.id,
       name: product.name,
       price: product.price,
-      imageUrl: product.image,
+      imageUrl: product.imageUrl,
       slug: product.slug,
       quantity: 1,
     });

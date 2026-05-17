@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import Image from "next/image";
 import ProductCard from "@/components/ui/ProductCard";
 import { useProductFilter } from "@/hooks/useProductFilter";
+import { Product } from "@/types/product";
 import {
   ChevronDown,
   X,
@@ -55,8 +56,8 @@ const FilterAccordion = ({
   </div>
 );
 
-export default function PromotionsPage() {
-  const [productsFromDB, setProductsFromDB] = useState<any[]>([]);
+function PromotionsPageContent() {
+  const [productsFromDB, setProductsFromDB] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -70,8 +71,8 @@ export default function PromotionsPage() {
         const productsArray = Array.isArray(data) ? data : data.products || [];
 
         const promoProducts = productsArray
-          .filter((p: any) => p.discountPercent > 0)
-          .map((p: any) => ({
+          .filter((p: Product) => (p.discountPercent || 0) > 0)
+          .map((p: Product) => ({
             ...p,
             id: p._id?.toString() || p.id || p.slug,
           }));
@@ -377,7 +378,7 @@ export default function PromotionsPage() {
               </div>
             ) : (
               <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
-                {paginatedProducts.map((product: any) => (
+                {paginatedProducts.map((product) => (
                   <ProductCard key={product.id} product={product} />
                 ))}
               </div>
@@ -440,5 +441,19 @@ export default function PromotionsPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function PromotionsPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-white">
+          Đang tải dữ liệu...
+        </div>
+      }
+    >
+      <PromotionsPageContent />
+    </Suspense>
   );
 }

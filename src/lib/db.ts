@@ -6,10 +6,19 @@ if (!MONGODB_URI) {
   throw new Error("Vui lòng định nghĩa MONGODB_URI trong file .env");
 }
 
-let cached = (global as any).mongoose;
+type MongooseCache = {
+  conn: typeof mongoose | null;
+  promise: Promise<typeof mongoose> | null;
+};
+
+declare global {
+  var mongoose: MongooseCache | undefined;
+}
+
+let cached = global.mongoose;
 
 if (!cached) {
-  cached = (global as any).mongoose = { conn: null, promise: null };
+  cached = global.mongoose = { conn: null, promise: null };
 }
 
 export const connectToDatabase = async () => {

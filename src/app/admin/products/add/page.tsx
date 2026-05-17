@@ -1,12 +1,10 @@
 "use client";
 
 import React, { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Save, ArrowLeft } from "lucide-react";
 
 export default function AddProductPage() {
-  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
   // Khởi tạo state lưu trữ dữ liệu form
@@ -23,10 +21,14 @@ export default function AddProductPage() {
     description: "",
   });
 
-  // Hàm xử lý khi người dùng gõ vào input
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  // ĐÃ SỬA LỖI Ở ĐÂY: Thêm | HTMLSelectElement vào kiểu dữ liệu
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
+  ) => {
     const { name, value } = e.target;
-    
+
     // Tự động tạo slug (link thân thiện) khi nhập tên sản phẩm
     if (name === "name") {
       const generatedSlug = value
@@ -36,7 +38,7 @@ export default function AddProductPage() {
         .replace(/[^a-z0-9]/g, "-") // Thay khoảng trắng và ký tự đặc biệt bằng dấu gạch ngang
         .replace(/-+/g, "-") // Xóa các dấu gạch ngang liền nhau
         .replace(/^-|-$/g, ""); // Xóa dấu gạch ngang ở đầu và cuối
-        
+
       setFormData((prev) => ({ ...prev, [name]: value, slug: generatedSlug }));
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
@@ -90,7 +92,7 @@ export default function AddProductPage() {
         const errorData = await res.json();
         alert(`Lỗi: ${errorData.message}`);
       }
-    } catch (error) {
+    } catch {
       alert("Có lỗi xảy ra khi kết nối đến máy chủ.");
     } finally {
       setIsLoading(false);
@@ -109,12 +111,17 @@ export default function AddProductPage() {
         </Link>
       </div>
 
-      <form onSubmit={handleSubmit} className="bg-white p-8 rounded-xl shadow-sm border border-gray-100">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white p-8 rounded-xl shadow-sm border border-gray-100"
+      >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           {/* Cột trái */}
           <div className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Tên sản phẩm *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Tên sản phẩm *
+              </label>
               <input
                 type="text"
                 name="name"
@@ -127,7 +134,9 @@ export default function AddProductPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Đường dẫn (Slug)</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Đường dẫn (Slug)
+              </label>
               <input
                 type="text"
                 name="slug"
@@ -138,7 +147,9 @@ export default function AddProductPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Danh mục *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Danh mục *
+              </label>
               <select
                 name="category"
                 required
@@ -146,7 +157,9 @@ export default function AddProductPage() {
                 onChange={handleChange}
                 className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white"
               >
-                <option value="" disabled>-- Chọn danh mục --</option>
+                <option value="" disabled>
+                  -- Chọn danh mục --
+                </option>
                 <option value="phong-khach">Phòng Khách</option>
                 <option value="phong-ngu">Phòng Ngủ</option>
                 <option value="phong-an">Phòng Ăn</option>
@@ -159,7 +172,9 @@ export default function AddProductPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Giá bán (VNĐ) *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Giá bán (VNĐ) *
+                </label>
                 <input
                   type="number"
                   name="price"
@@ -171,7 +186,9 @@ export default function AddProductPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Giá gốc (VNĐ)</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Giá gốc (VNĐ)
+                </label>
                 <input
                   type="number"
                   name="originalPrice"
@@ -182,9 +199,11 @@ export default function AddProductPage() {
                 />
               </div>
             </div>
-            
+
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Link hình ảnh (URL) *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Link hình ảnh (URL) *
+              </label>
               <input
                 type="text"
                 name="imageUrl"
@@ -200,7 +219,9 @@ export default function AddProductPage() {
           {/* Cột phải */}
           <div className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Chất liệu</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Chất liệu
+              </label>
               <input
                 type="text"
                 name="material"
@@ -209,9 +230,11 @@ export default function AddProductPage() {
                 className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-orange-500"
               />
             </div>
-            
+
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Kích thước</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Kích thước
+              </label>
               <input
                 type="text"
                 name="size"
@@ -222,7 +245,9 @@ export default function AddProductPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Màu sắc</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Màu sắc
+              </label>
               <input
                 type="text"
                 name="color"
@@ -236,7 +261,9 @@ export default function AddProductPage() {
 
         {/* Mô tả full width */}
         <div className="mb-8">
-          <label className="block text-sm font-medium text-gray-700 mb-2">Mô tả chi tiết</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Mô tả chi tiết
+          </label>
           <textarea
             name="description"
             rows={5}
@@ -252,7 +279,9 @@ export default function AddProductPage() {
             type="submit"
             disabled={isLoading}
             className={`flex items-center gap-2 px-8 py-3 rounded-lg text-white font-bold transition-colors ${
-              isLoading ? "bg-gray-400 cursor-not-allowed" : "bg-orange-600 hover:bg-orange-700"
+              isLoading
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-orange-600 hover:bg-orange-700"
             }`}
           >
             {isLoading ? (

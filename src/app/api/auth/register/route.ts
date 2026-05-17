@@ -3,6 +3,9 @@ import bcrypt from "bcryptjs";
 import User from "@/models/User";
 import { connectToDatabase } from "@/lib/db"; // Đường dẫn file db của bạn
 
+const getErrorMessage = (error: unknown) =>
+  error instanceof Error ? error.message : "Lỗi không xác định";
+
 export async function POST(req: Request) {
   try {
     await connectToDatabase();
@@ -30,7 +33,7 @@ export async function POST(req: Request) {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     // 3. Lưu thêm name vào DB
-    const newUser = await User.create({
+    await User.create({
       name, // Lưu Tên khách hàng
       email,
       phone,
@@ -38,12 +41,12 @@ export async function POST(req: Request) {
     });
 
     return NextResponse.json(
-      { message: "Đăng ký thành công", user: newUser },
+      { message: "Đăng ký thành công" },
       { status: 201 },
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
     return NextResponse.json(
-      { message: "Lỗi server: " + error.message },
+      { message: "Lỗi server: " + getErrorMessage(error) },
       { status: 500 },
     );
   }

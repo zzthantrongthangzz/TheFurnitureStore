@@ -1,7 +1,7 @@
 // src/app/phong-ngu/ban-trang-diem/page.tsx
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { mockProducts } from "@/data/mockProducts";
@@ -47,7 +47,7 @@ const FilterAccordion = ({
   </div>
 );
 
-export default function DressingTablePage() {
+function DressingTablePageContent() {
   // LỌC DỮ LIỆU CẤP 3: Bàn trang điểm
   const dressingTableProducts = mockProducts.filter(
     (p) => p.category === "phong-ngu" && p.subCategory === "ban-trang-diem",
@@ -529,5 +529,19 @@ export default function DressingTablePage() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function DressingTablePage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-white">
+          Đang tải dữ liệu...
+        </div>
+      }
+    >
+      <DressingTablePageContent />
+    </Suspense>
   );
 }

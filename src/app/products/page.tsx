@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import Image from "next/image";
-import ProductCard from "@/components/ui/ProductCard"; // Đã cập nhật đường dẫn vào thư mục ui
+import ProductCard from "@/components/ui/ProductCard";
 import { useProductFilter } from "@/hooks/useProductFilter";
+import { Product } from "@/types/product";
 import {
   ChevronDown,
   X,
@@ -53,8 +54,9 @@ const FilterAccordion = ({
   </div>
 );
 
-export default function AllProductsPage() {
-  const [productsFromDB, setProductsFromDB] = useState<any[]>([]);
+// BƯỚC 2: ĐỔI TÊN HÀM CHÍNH THÀNH Content
+function AllProductsContent() {
+  const [productsFromDB, setProductsFromDB] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -76,7 +78,7 @@ export default function AllProductsPage() {
 
         if (!abortController.signal.aborted) {
           if (Array.isArray(data)) {
-            const formattedData = data.map((p: any) => ({
+            const formattedData = data.map((p: Product) => ({
               ...p,
               id: p._id?.toString() || p.id || p.slug,
             }));
@@ -86,8 +88,8 @@ export default function AllProductsPage() {
             setProductsFromDB([]);
           }
         }
-      } catch (error: any) {
-        if (error.name === "AbortError") {
+      } catch (error: unknown) {
+        if (error instanceof Error && error.name === "AbortError") {
           return;
         }
         console.error("Lỗi kết nối hoặc lỗi server:", error);
@@ -176,7 +178,6 @@ export default function AllProductsPage() {
         <div className="absolute inset-0 bg-black/10 z-10" />
       </div>
 
-      {/* ĐÃ SỬA: Nới rộng max-w lên 1400px */}
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8 xl:py-12">
         <div className="mb-6 border-b border-gray-100 pb-4">
           <h1 className="text-3xl md:text-4xl font-bold uppercase tracking-wider mb-4 text-gray-900">
@@ -235,9 +236,7 @@ export default function AllProductsPage() {
           </div>
         )}
 
-        {/* ĐÃ SỬA: Tăng gap-8 lên gap-12 để thoáng hơn */}
         <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
-          {/* Cố định chiều rộng sidebar bộ lọc */}
           <aside className="w-full lg:w-[260px] shrink-0">
             <div className="sticky top-24 space-y-5">
               <h2 className="font-bold text-xl text-gray-900 border-b-2 border-gray-900 pb-2 mb-6">
@@ -364,8 +363,7 @@ export default function AllProductsPage() {
               </div>
             ) : (
               <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-8">
-                {/* ĐÃ SỬA: Thay thế toàn bộ code cứng bằng Component ProductCard */}
-                {paginatedProducts.map((product: any) => (
+                {paginatedProducts.map((product) => (
                   <ProductCard key={product.id} product={product} />
                 ))}
               </div>
@@ -427,5 +425,20 @@ export default function AllProductsPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+// BƯỚC 3: THÊM HÀM WRAPPER BỌC SUSPENSE
+export default function AllProductsPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-white">
+          Đang tải dữ liệu sản phẩm...
+        </div>
+      }
+    >
+      <AllProductsContent />
+    </Suspense>
   );
 }
