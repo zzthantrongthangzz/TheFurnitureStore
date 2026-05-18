@@ -122,6 +122,12 @@ export default function AddProductPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isUploadingImage) return;
+
+    if (!formData.imageUrl) {
+      alert("Vui lòng upload ảnh sản phẩm trước khi lưu.");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -290,15 +296,15 @@ export default function AddProductPage() {
                 name="imageUrl"
                 required
                 value={formData.imageUrl}
-                onChange={handleChange}
-                className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                readOnly
+                className="w-full border border-gray-200 bg-gray-50 text-gray-500 rounded-lg p-3 outline-none cursor-not-allowed"
                 placeholder="https://res.cloudinary.com/..."
               />
-              <p className="mt-2 text-xs text-gray-500">
-                {isUploadingImage
-                  ? "Đang upload ảnh lên Cloudinary..."
-                  : "Ảnh mới sẽ được lưu trên Cloudinary; ảnh cũ trong public vẫn dùng bình thường."}
-              </p>
+              {isUploadingImage && (
+                <p className="mt-2 text-xs text-gray-500">
+                  Đang upload ảnh lên Cloudinary...
+                </p>
+              )}
             </div>
           </div>
 
