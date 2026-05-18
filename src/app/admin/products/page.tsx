@@ -98,7 +98,7 @@ export default function AdminProductsList() {
                   <td className="p-4">
                     <div className="relative w-16 h-16 rounded-md overflow-hidden bg-gray-100">
                       <Image
-                        src={product.imageUrl || "/images/placeholder.jpg"}
+                        src={product.imageUrl || "/file.svg"}
                         alt={product.name}
                         fill
                         sizes="64px"

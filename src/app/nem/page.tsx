@@ -121,7 +121,7 @@ function MattressContent() {
     <main className="min-h-screen bg-white text-gray-800">
       <div className="w-full relative aspect-[21/9] md:aspect-[1920/400] bg-gray-100 overflow-hidden">
         <Image
-          src="/images/banner-nem.jpg"
+          src="/images/banner-products.jpg"
           alt="Thế giới Nệm"
           fill
           sizes="100vw"

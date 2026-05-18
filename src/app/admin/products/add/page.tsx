@@ -4,8 +4,24 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { Save, ArrowLeft } from "lucide-react";
 
+type CloudinarySignatureResponse = {
+  apiKey: string;
+  cloudName: string;
+  folder: string;
+  signature: string;
+  timestamp: number;
+  uploadUrl: string;
+  message?: string;
+};
+
+type CloudinaryUploadResponse = {
+  secure_url?: string;
+  error?: { message?: string };
+};
+
 export default function AddProductPage() {
   const [isLoading, setIsLoading] = useState(false);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
 
   // Khởi tạo state lưu trữ dữ liệu form
   const [formData, setFormData] = useState({
@@ -45,9 +61,67 @@ export default function AddProductPage() {
     }
   };
 
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      alert("Vui lòng chọn đúng file ảnh.");
+      e.target.value = "";
+      return;
+    }
+
+    setIsUploadingImage(true);
+
+    try {
+      const signatureRes = await fetch("/api/upload/signature", {
+        method: "POST",
+      });
+      const signatureData =
+        (await signatureRes.json()) as CloudinarySignatureResponse;
+
+      if (!signatureRes.ok) {
+        throw new Error(
+          signatureData.message || "Không thể tạo chữ ký upload ảnh.",
+        );
+      }
+
+      const uploadBody = new FormData();
+      uploadBody.append("file", file);
+      uploadBody.append("api_key", signatureData.apiKey);
+      uploadBody.append("timestamp", String(signatureData.timestamp));
+      uploadBody.append("signature", signatureData.signature);
+      uploadBody.append("folder", signatureData.folder);
+
+      const uploadRes = await fetch(signatureData.uploadUrl, {
+        method: "POST",
+        body: uploadBody,
+      });
+      const uploadData = (await uploadRes.json()) as CloudinaryUploadResponse;
+
+      if (!uploadRes.ok || !uploadData.secure_url) {
+        throw new Error(
+          uploadData.error?.message || "Upload ảnh lên Cloudinary thất bại.",
+        );
+      }
+
+      setFormData((prev) => ({
+        ...prev,
+        imageUrl: uploadData.secure_url || "",
+      }));
+    } catch (error) {
+      console.error("Lỗi upload ảnh:", error);
+      alert(error instanceof Error ? error.message : "Không thể upload ảnh.");
+    } finally {
+      setIsUploadingImage(false);
+      e.target.value = "";
+    }
+  };
+
   // Hàm gửi dữ liệu lên API
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isUploadingImage) return;
     setIsLoading(true);
 
     try {
@@ -205,14 +279,26 @@ export default function AddProductPage() {
                 Link hình ảnh (URL) *
               </label>
               <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                disabled={isUploadingImage}
+                className="w-full border border-dashed border-orange-300 bg-orange-50/50 rounded-lg p-3 mb-3 file:mr-4 file:rounded-md file:border-0 file:bg-orange-600 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-orange-700 disabled:cursor-not-allowed disabled:opacity-60"
+              />
+              <input
                 type="text"
                 name="imageUrl"
                 required
                 value={formData.imageUrl}
                 onChange={handleChange}
                 className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                placeholder="https://..."
+                placeholder="https://res.cloudinary.com/..."
               />
+              <p className="mt-2 text-xs text-gray-500">
+                {isUploadingImage
+                  ? "Đang upload ảnh lên Cloudinary..."
+                  : "Ảnh mới sẽ được lưu trên Cloudinary; ảnh cũ trong public vẫn dùng bình thường."}
+              </p>
             </div>
           </div>
 
@@ -277,14 +363,16 @@ export default function AddProductPage() {
         <div className="flex justify-end">
           <button
             type="submit"
-            disabled={isLoading}
+            disabled={isLoading || isUploadingImage}
             className={`flex items-center gap-2 px-8 py-3 rounded-lg text-white font-bold transition-colors ${
-              isLoading
+              isLoading || isUploadingImage
                 ? "bg-gray-400 cursor-not-allowed"
                 : "bg-orange-600 hover:bg-orange-700"
             }`}
           >
-            {isLoading ? (
+            {isUploadingImage ? (
+              "Đang upload ảnh..."
+            ) : isLoading ? (
               "Đang lưu..."
             ) : (
               <>

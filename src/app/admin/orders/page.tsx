@@ -111,7 +111,7 @@ export default function OrdersManagementPage() {
               name: "Tủ Quần Áo Đơn VLINE V3 60cm",
               price: 7990000,
               quantity: 2,
-              imageUrl: "https://via.placeholder.com/150",
+              imageUrl: "/file.svg",
             },
           ],
           totalAmount: 15980000,

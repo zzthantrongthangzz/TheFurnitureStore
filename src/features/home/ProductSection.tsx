@@ -1,61 +1,69 @@
 import React from "react";
 import { ChevronRight } from "lucide-react";
 import ProductCard from "@/components/ui/ProductCard";
+import { connectToDatabase } from "@/lib/db";
+import ProductModel from "@/models/Product";
 
-// 1. Định nghĩa kiểu dữ liệu dựa trên schema MongoDB của bạn
 export interface MongoProduct {
   _id: string;
   name: string;
   slug: string;
   description: string;
   price: number;
-  originalPrice: number;
-  discountPercent: number;
+  originalPrice?: number;
+  discountPercent?: number;
   imageUrl: string;
   category: string;
-  inStock: boolean;
-  isActive: boolean;
+  inStock?: boolean;
+  isActive?: boolean;
+  soldQuantity?: number;
+  variants?: { inStock?: number }[];
 }
 
-// 2. Hàm fetch data gọi đến API route của bạn
+type ProductDocument = Omit<MongoProduct, "_id"> & {
+  _id: { toString(): string };
+};
+
 async function getProducts(): Promise<MongoProduct[]> {
   try {
-    // Gọi đến API route /api/products bạn đã tạo
-    // Trong môi trường dev, URL có thể là http://localhost:3000
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"}/api/products`,
-      {
-        cache: "no-store", // Đảm bảo luôn lấy data mới nhất (có thể đổi thành 'force-cache' nếu muốn)
-      },
-    );
+    await connectToDatabase();
 
-    if (!res.ok) throw new Error("Không thể tải dữ liệu sản phẩm");
+    const products = (await ProductModel.find({ isActive: true })
+      .sort({ createdAt: -1 })
+      .lean()) as ProductDocument[];
 
-    const data = await res.json();
-    // Giả sử API trả về object có dạng { success: true, data: [...] }
-    return data.data || data;
+    return products.map((product) => ({
+      _id: product._id.toString(),
+      name: product.name,
+      slug: product.slug,
+      description: product.description || "",
+      price: product.price,
+      originalPrice: product.originalPrice,
+      discountPercent: product.discountPercent,
+      imageUrl: product.imageUrl,
+      category: product.category,
+      inStock: product.inStock !== false,
+      isActive: product.isActive !== false,
+      soldQuantity: product.soldQuantity || 0,
+      variants: product.variants,
+    }));
   } catch (error) {
-    console.error("Lỗi khi fetch products:", error);
-    return []; // Trả về mảng rỗng nếu lỗi để UI không bị crash
+    console.error("Lỗi khi tải sản phẩm trang chủ:", error);
+    return [];
   }
 }
 
-// 3. Biến component thành async
 export default async function ProductSection() {
-  // Fetch toàn bộ sản phẩm
   const products = await getProducts();
 
-  // 4. Lọc và nhóm dữ liệu theo category từ MongoDB
-  // Lấy 4 sản phẩm đầu tiên cho mỗi nhóm để giao diện đẹp gọn
   const livingRoomProducts = products
-    .filter((p) => p.category === "phong-khach")
+    .filter((product) => product.category === "phong-khach")
     .slice(0, 5);
   const bedroomProducts = products
-    .filter((p) => p.category === "phong-ngu")
+    .filter((product) => product.category === "phong-ngu")
     .slice(0, 5);
 
-  // Cấu trúc lại mảng render để map ra UI
-  const PRODUCT_GROUPS = [
+  const productGroups = [
     {
       id: "living-room",
       title: "Nội Thất Phòng Khách",
@@ -69,9 +77,8 @@ export default async function ProductSection() {
   ];
 
   return (
-    // Thêm max-w-[1440px] để khung rộng ra đủ sức chứa 5 item trên màn hình to
     <section className="container mx-auto px-4 py-16 space-y-16 max-w-[1440px]">
-      {PRODUCT_GROUPS.map(
+      {productGroups.map(
         (group) =>
           group.products.length > 0 && (
             <div key={group.id}>
@@ -88,7 +95,6 @@ export default async function ProductSection() {
                 </button>
               </div>
 
-              {/* Thêm 2xl:justify-center để ép các thẻ vào giữa màn hình khi xem trên Desktop */}
               <div className="flex overflow-x-auto gap-6 pb-6 snap-x hide-scrollbar justify-start 2xl:justify-center">
                 {group.products.map((product) => (
                   <ProductCard key={product._id} product={product} />

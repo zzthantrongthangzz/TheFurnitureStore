@@ -4,10 +4,6 @@ import bcrypt from "bcryptjs";
 import User from "@/models/User";
 import { connectToDatabase } from "@/lib/db";
 
-if (!process.env.NEXTAUTH_SECRET) {
-  throw new Error("NEXTAUTH_SECRET is required");
-}
-
 // Tách cấu hình ra thành biến authOptions và thêm từ khóa 'export'
 // Khai báo kiểu NextAuthOptions để TypeScript hỗ trợ tốt nhất
 export const authOptions: NextAuthOptions = {
