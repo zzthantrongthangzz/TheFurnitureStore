@@ -136,10 +136,7 @@ export default function CartPage() {
                               </Link>
                             </h3>
                             <p className="ml-4 whitespace-nowrap text-orange-600 font-bold">
-                              {(item.price * item.quantity).toLocaleString(
-                                "vi-VN",
-                              )}{" "}
-                              đ
+                              {item.price.toLocaleString("vi-VN")} đ
                             </p>
                           </div>
                         </div>
