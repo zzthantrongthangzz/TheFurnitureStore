@@ -92,6 +92,14 @@ export default function DesignPage() {
     return () => clearInterval(timer);
   }, [currentIndex]);
 
+  const handleConsultationSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    e.currentTarget.reset();
+    alert(
+      "Đã gửi yêu cầu tư vấn thành công. 3T Home sẽ liên hệ lại với bạn trong thời gian sớm nhất.",
+    );
+  };
+
   return (
     <main className="bg-[#FDFBF7] min-h-screen font-sans text-gray-800 pb-20 overflow-x-hidden">
       {/* 1. HERO SECTION */}
@@ -233,7 +241,7 @@ export default function DesignPage() {
             data-aos-delay="300"
           >
             <h2 className="text-3xl font-bold mb-4">ĐĂNG KÝ TƯ VẤN TẠI NHÀ</h2>
-            <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
+            <form className="space-y-4" onSubmit={handleConsultationSubmit}>
               <input
                 type="text"
                 placeholder="Tên của bạn"
@@ -318,7 +326,7 @@ export default function DesignPage() {
         </div>
         <div className="text-center" data-aos="fade-up">
           <Link
-            href="/projects"
+            href="/products"
             className="inline-block border-2 border-gray-900 text-gray-900 font-bold py-4 px-12 rounded-full hover:bg-gray-900 hover:text-white transition-all"
           >
             XEM TẤT CẢ

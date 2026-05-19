@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import ProductCard from "@/components/ui/ProductCard";
 import { connectToDatabase } from "@/lib/db";
@@ -68,11 +69,13 @@ export default async function ProductSection() {
       id: "living-room",
       title: "Nội Thất Phòng Khách",
       products: livingRoomProducts,
+      href: "/phong-khach",
     },
     {
       id: "bedroom",
       title: "Nội Thất Phòng Ngủ",
       products: bedroomProducts,
+      href: "/phong-ngu",
     },
   ];
 
@@ -86,13 +89,16 @@ export default async function ProductSection() {
                 <h2 className="text-2xl md:text-3xl font-bold text-gray-800">
                   {group.title}
                 </h2>
-                <button className="text-orange-600 hover:text-orange-700 font-medium flex items-center gap-1 group">
+                <Link
+                  href={group.href}
+                  className="text-orange-600 hover:text-orange-700 font-medium flex items-center gap-1 group"
+                >
                   Xem thêm
                   <ChevronRight
                     size={18}
                     className="group-hover:translate-x-1 transition-transform"
                   />
-                </button>
+                </Link>
               </div>
 
               <div className="flex overflow-x-auto gap-6 pb-6 snap-x hide-scrollbar justify-start 2xl:justify-center">

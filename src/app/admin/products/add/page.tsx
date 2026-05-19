@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { Save, ArrowLeft } from "lucide-react";
+import { productCategories } from "@/data/navData";
 
 type CloudinarySignatureResponse = {
   apiKey: string;
@@ -19,25 +20,76 @@ type CloudinaryUploadResponse = {
   error?: { message?: string };
 };
 
+type ProductFormState = {
+  name: string;
+  slug: string;
+  category: string;
+  subCategory: string;
+  collectionName: string;
+  price: string;
+  originalPrice: string;
+  imageUrl: string;
+  gallery: string[];
+  material: string;
+  size: string;
+  color: string;
+  description: string;
+};
+
+const initialFormData: ProductFormState = {
+  name: "",
+  slug: "",
+  category: "",
+  subCategory: "",
+  collectionName: "",
+  price: "",
+  originalPrice: "",
+  imageUrl: "",
+  gallery: [],
+  material: "",
+  size: "",
+  color: "",
+  description: "",
+};
+
+const getCategoryValue = (href: string) => {
+  const path = href.split("?")[0];
+  if (path === "/collections") return "bo-suu-tap";
+  return path.replace("/", "");
+};
+
+const getSubCategoryValue = (href: string) => {
+  const query = href.split("?")[1];
+  if (!query) return "";
+  return new URLSearchParams(query).get("category") || "";
+};
+
+const adminCategories = productCategories.map((category) => ({
+  label: category.title,
+  value: getCategoryValue(category.href),
+  items:
+    category.items?.map((item) => ({
+      label: item.name,
+      value: getSubCategoryValue(item.href),
+    })) || [],
+}));
+
 export default function AddProductPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [formData, setFormData] = useState<ProductFormState>(initialFormData);
 
-  // Khởi tạo state lưu trữ dữ liệu form
-  const [formData, setFormData] = useState({
-    name: "",
-    slug: "",
-    category: "",
-    price: "",
-    originalPrice: "",
-    imageUrl: "",
-    material: "",
-    size: "",
-    color: "",
-    description: "",
-  });
+  const selectedCategory = adminCategories.find(
+    (category) => category.value === formData.category,
+  );
+  const classificationValue =
+    formData.category === "bo-suu-tap"
+      ? formData.collectionName
+      : formData.subCategory;
+  const uploadedImageCount = formData.imageUrl
+    ? 1 + formData.gallery.length
+    : 0;
 
-  // ĐÃ SỬA LỖI Ở ĐÂY: Thêm | HTMLSelectElement vào kiểu dữ liệu
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
@@ -45,28 +97,76 @@ export default function AddProductPage() {
   ) => {
     const { name, value } = e.target;
 
-    // Tự động tạo slug (link thân thiện) khi nhập tên sản phẩm
+    if (name === "category") {
+      setFormData((prev) => ({
+        ...prev,
+        category: value,
+        subCategory: "",
+        collectionName: "",
+      }));
+      return;
+    }
+
     if (name === "name") {
       const generatedSlug = value
         .toLowerCase()
         .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "") // Xóa dấu tiếng Việt
-        .replace(/[^a-z0-9]/g, "-") // Thay khoảng trắng và ký tự đặc biệt bằng dấu gạch ngang
-        .replace(/-+/g, "-") // Xóa các dấu gạch ngang liền nhau
-        .replace(/^-|-$/g, ""); // Xóa dấu gạch ngang ở đầu và cuối
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9]/g, "-")
+        .replace(/-+/g, "-")
+        .replace(/^-|-$/g, "");
 
-      setFormData((prev) => ({ ...prev, [name]: value, slug: generatedSlug }));
-    } else {
-      setFormData((prev) => ({ ...prev, [name]: value }));
+      setFormData((prev) => ({ ...prev, name: value, slug: generatedSlug }));
+      return;
     }
+
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleClassificationChange = (
+    e: React.ChangeEvent<HTMLSelectElement>,
+  ) => {
+    const value = e.target.value;
+
+    setFormData((prev) =>
+      prev.category === "bo-suu-tap"
+        ? { ...prev, collectionName: value, subCategory: "" }
+        : { ...prev, subCategory: value, collectionName: "" },
+    );
+  };
+
+  const uploadImageFile = async (
+    file: File,
+    signatureData: CloudinarySignatureResponse,
+  ) => {
+    const uploadBody = new FormData();
+    uploadBody.append("file", file);
+    uploadBody.append("api_key", signatureData.apiKey);
+    uploadBody.append("timestamp", String(signatureData.timestamp));
+    uploadBody.append("signature", signatureData.signature);
+    uploadBody.append("folder", signatureData.folder);
+
+    const uploadRes = await fetch(signatureData.uploadUrl, {
+      method: "POST",
+      body: uploadBody,
+    });
+    const uploadData = (await uploadRes.json()) as CloudinaryUploadResponse;
+
+    if (!uploadRes.ok || !uploadData.secure_url) {
+      throw new Error(
+        uploadData.error?.message || "Upload ảnh lên Cloudinary thất bại.",
+      );
+    }
+
+    return uploadData.secure_url;
   };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
 
-    if (!file.type.startsWith("image/")) {
-      alert("Vui lòng chọn đúng file ảnh.");
+    if (files.some((file) => !file.type.startsWith("image/"))) {
+      alert("Vui lòng chỉ chọn file ảnh.");
       e.target.value = "";
       return;
     }
@@ -86,29 +186,19 @@ export default function AddProductPage() {
         );
       }
 
-      const uploadBody = new FormData();
-      uploadBody.append("file", file);
-      uploadBody.append("api_key", signatureData.apiKey);
-      uploadBody.append("timestamp", String(signatureData.timestamp));
-      uploadBody.append("signature", signatureData.signature);
-      uploadBody.append("folder", signatureData.folder);
+      const uploadedUrls = await Promise.all(
+        files.map((file) => uploadImageFile(file, signatureData)),
+      );
 
-      const uploadRes = await fetch(signatureData.uploadUrl, {
-        method: "POST",
-        body: uploadBody,
+      setFormData((prev) => {
+        const currentImages = prev.imageUrl
+          ? [prev.imageUrl, ...prev.gallery]
+          : [];
+        const nextImages = [...currentImages, ...uploadedUrls];
+        const [imageUrl = "", ...gallery] = nextImages;
+
+        return { ...prev, imageUrl, gallery };
       });
-      const uploadData = (await uploadRes.json()) as CloudinaryUploadResponse;
-
-      if (!uploadRes.ok || !uploadData.secure_url) {
-        throw new Error(
-          uploadData.error?.message || "Upload ảnh lên Cloudinary thất bại.",
-        );
-      }
-
-      setFormData((prev) => ({
-        ...prev,
-        imageUrl: uploadData.secure_url || "",
-      }));
     } catch (error) {
       console.error("Lỗi upload ảnh:", error);
       alert(error instanceof Error ? error.message : "Không thể upload ảnh.");
@@ -118,10 +208,18 @@ export default function AddProductPage() {
     }
   };
 
-  // Hàm gửi dữ liệu lên API
+  const clearUploadedImages = () => {
+    setFormData((prev) => ({ ...prev, imageUrl: "", gallery: [] }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isUploadingImage) return;
+
+    if (!classificationValue) {
+      alert("Vui lòng chọn phân loại sản phẩm.");
+      return;
+    }
 
     if (!formData.imageUrl) {
       alert("Vui lòng upload ảnh sản phẩm trước khi lưu.");
@@ -131,16 +229,18 @@ export default function AddProductPage() {
     setIsLoading(true);
 
     try {
-      // Ép kiểu dữ liệu giá tiền về số trước khi gửi
+      const isCollection = formData.category === "bo-suu-tap";
       const payload = {
         name: formData.name,
         slug: formData.slug,
         category: formData.category,
+        subCategory: isCollection ? undefined : formData.subCategory,
+        collectionName: isCollection ? formData.collectionName : undefined,
         price: Number(formData.price),
         originalPrice: Number(formData.originalPrice) || Number(formData.price),
         imageUrl: formData.imageUrl,
+        gallery: formData.gallery,
         description: formData.description,
-        // Dựa theo logic cũ của bạn, các thông số được lưu trong mảng attributes
         attributes: [
           { key: "Chất liệu", value: formData.material },
           { key: "Kích thước", value: formData.size },
@@ -156,18 +256,7 @@ export default function AddProductPage() {
 
       if (res.ok) {
         alert("Đã thêm sản phẩm thành công!");
-        setFormData({
-          name: "",
-          slug: "",
-          category: "",
-          price: "",
-          originalPrice: "",
-          imageUrl: "",
-          material: "",
-          size: "",
-          color: "",
-          description: "",
-        });
+        setFormData(initialFormData);
       } else {
         const errorData = await res.json();
         alert(`Lỗi: ${errorData.message}`);
@@ -196,7 +285,6 @@ export default function AddProductPage() {
         className="bg-white p-8 rounded-xl shadow-sm border border-gray-100"
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          {/* Cột trái */}
           <div className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -240,13 +328,33 @@ export default function AddProductPage() {
                 <option value="" disabled>
                   -- Chọn danh mục --
                 </option>
-                <option value="phong-khach">Phòng Khách</option>
-                <option value="phong-ngu">Phòng Ngủ</option>
-                <option value="phong-an">Phòng Ăn</option>
-                <option value="phong-lam-viec">Phòng Làm Việc</option>
-                <option value="tu-bep">Tủ Bếp</option>
-                <option value="nem">Nệm</option>
-                <option value="bo-suu-tap">Bộ Sưu Tập</option>
+                {adminCategories.map((category) => (
+                  <option key={category.value} value={category.value}>
+                    {category.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Phân loại *
+              </label>
+              <select
+                required
+                disabled={!selectedCategory}
+                value={classificationValue}
+                onChange={handleClassificationChange}
+                className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white disabled:bg-gray-50 disabled:text-gray-400"
+              >
+                <option value="" disabled>
+                  -- Chọn phân loại --
+                </option>
+                {selectedCategory?.items.map((item) => (
+                  <option key={item.value} value={item.value}>
+                    {item.label}
+                  </option>
+                ))}
               </select>
             </div>
 
@@ -282,11 +390,12 @@ export default function AddProductPage() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Link hình ảnh (URL) *
+                Hình ảnh sản phẩm *
               </label>
               <input
                 type="file"
                 accept="image/*"
+                multiple
                 onChange={handleImageUpload}
                 disabled={isUploadingImage}
                 className="w-full border border-dashed border-orange-300 bg-orange-50/50 rounded-lg p-3 mb-3 file:mr-4 file:rounded-md file:border-0 file:bg-orange-600 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-orange-700 disabled:cursor-not-allowed disabled:opacity-60"
@@ -300,15 +409,27 @@ export default function AddProductPage() {
                 className="w-full border border-gray-200 bg-gray-50 text-gray-500 rounded-lg p-3 outline-none cursor-not-allowed"
                 placeholder="https://res.cloudinary.com/..."
               />
-              {isUploadingImage && (
-                <p className="mt-2 text-xs text-gray-500">
-                  Đang upload ảnh lên Cloudinary...
-                </p>
-              )}
+              <div className="mt-2 flex items-center justify-between gap-3 text-xs text-gray-500">
+                <span>
+                  {isUploadingImage
+                    ? "Đang upload ảnh lên Cloudinary..."
+                    : uploadedImageCount > 0
+                      ? `Đã upload ${uploadedImageCount} ảnh`
+                      : ""}
+                </span>
+                {uploadedImageCount > 0 && (
+                  <button
+                    type="button"
+                    onClick={clearUploadedImages}
+                    className="font-semibold text-red-500 hover:text-red-600"
+                  >
+                    Xóa ảnh đã chọn
+                  </button>
+                )}
+              </div>
             </div>
           </div>
 
-          {/* Cột phải */}
           <div className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -351,7 +472,6 @@ export default function AddProductPage() {
           </div>
         </div>
 
-        {/* Mô tả full width */}
         <div className="mb-8">
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Mô tả chi tiết
@@ -362,7 +482,7 @@ export default function AddProductPage() {
             value={formData.description}
             onChange={handleChange}
             className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-orange-500"
-            placeholder="Nhập mô tả sản phẩm (có thể hỗ trợ thẻ HTML cơ bản)..."
+            placeholder="Nhập mô tả sản phẩm..."
           />
         </div>
 
