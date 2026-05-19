@@ -190,7 +190,8 @@ function MattressContent() {
               >
                 <div className="space-y-3 text-sm text-gray-600">
                   {[
-                    "Dưới 5.000.000đ",
+                    "500.000đ - 2.000.000đ",
+                    "2.000.000đ - 5.000.000đ",
                     "5.000.000đ - 10.000.000đ",
                     "Trên 10.000.000đ",
                   ].map((range) => (

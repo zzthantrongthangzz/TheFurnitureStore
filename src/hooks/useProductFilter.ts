@@ -102,14 +102,13 @@ export const useProductFilter = (initialProducts: Product[]) => {
         let matchCheckbox = false;
         if (filters.priceRanges.length > 0) {
           matchCheckbox = filters.priceRanges.some((range) => {
-            if (range === "Dưới 500.000đ") return p.price < 500000;
-            if (range === "500.000đ - 1.000.000đ")
-              return p.price >= 500000 && p.price <= 1000000;
-            if (range === "1.000.000đ - 1.500.000đ")
-              return p.price > 1000000 && p.price <= 1500000;
+            if (range === "500.000đ - 2.000.000đ")
+              return p.price >= 500000 && p.price <= 2000000;
             if (range === "2.000.000đ - 5.000.000đ")
-              return p.price >= 2000000 && p.price <= 5000000;
-            if (range === "Trên 5.000.000đ") return p.price > 5000000;
+              return p.price > 2000000 && p.price <= 5000000;
+            if (range === "5.000.000đ - 10.000.000đ")
+              return p.price > 5000000 && p.price <= 10000000;
+            if (range === "Trên 10.000.000đ") return p.price > 10000000;
             return false;
           });
         }
